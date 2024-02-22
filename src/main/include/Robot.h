@@ -5,11 +5,13 @@
 #pragma once
 
 #include <optional>
+#include <units/angle.h>
 
 #include <frc/TimedRobot.h>
 #include <frc2/command/CommandPtr.h>
 
 #include "RobotContainer.h"
+#include "swerve/SwerveModule.h"
 
 class Robot : public frc::TimedRobot {
  public:

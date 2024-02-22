@@ -5,6 +5,11 @@
 #pragma once
 
 #include <frc2/command/CommandPtr.h>
+#include <frc/XboxController.h>
+#include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SendableChooser.h>
+#include <frc2/command/Command.h>
+#include "subsystems/DriveBase.h"
 
 class RobotContainer {
  public:
@@ -12,6 +17,13 @@ class RobotContainer {
 
   frc2::CommandPtr GetAutonomousCommand();
 
+  void TestInit();
+  void TestPeriodic();
+
  private:
   void ConfigureBindings();
+
+  frc::XboxController m_driveController {0};
+  
+  DriveBase m_driveBase {};
 };
