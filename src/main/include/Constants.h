@@ -43,8 +43,8 @@ namespace constants
         constexpr units::meter_t moduleRadius = 0.38615_m;
         constexpr double driveGearRatio = 6.75;
 
-        double driveMeasurementFudgeFactor = 1.0; // To match expected real-world measurements
-        double angularVelocityFudgeFactor = 1.0; // To account for lateral drift
+        constexpr double driveMeasurementFudgeFactor = 1.0; // To match expected real-world measurements
+        constexpr double angularVelocityFudgeFactor = 1.0; // To account for lateral drift
 
         // Drive encoder measurement values
         constexpr uint32_t driveEncoderDepth = 8;
@@ -108,6 +108,12 @@ namespace constants
         );
     }
 
+    namespace intake
+    {
+        constexpr units::volt_t intakePower = 0.0_V;
+        constexpr units::volt_t feedToOuttakePower = 0.0_V;
+    }
+
     namespace preferences
     {
         constexpr std::string_view driveP_Key = "Drive PID P";
@@ -159,5 +165,15 @@ namespace constants
             constexpr int back_left = 11;
             constexpr int back_right = 12;
         }
+    }
+
+    namespace pwm_channels
+    {
+        constexpr int intakeMotor = 0;
+    }
+
+    namespace dio_ports
+    {
+        constexpr int photoElectricSensor = 0;
     }
 }

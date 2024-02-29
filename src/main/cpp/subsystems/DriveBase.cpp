@@ -10,7 +10,7 @@ DriveBase::DriveBase()
     frc::SmartDashboard::PutBoolean("Cosine scaling", true);
     frc::SmartDashboard::PutNumber("Cosine scaling exponent", constants::drive::cosineScalingExponent);
 
-    fmt::print("\nInstantiating DriveBase...\n");
+    fmt::print("\nInitializing DriveBase...\n");
 
     m_swerveModules[0] = std::move(std::make_unique<SwerveModule>(
         "Swerve Module (FL)", 
@@ -83,8 +83,8 @@ DriveBase::DriveBase()
 
         this
     );
-
-    fmt::print("\n");
+    
+    fmt::print("DriveBase Initialization complete\n\n");
 }
 
 void DriveBase::Periodic()
