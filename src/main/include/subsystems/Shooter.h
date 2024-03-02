@@ -16,7 +16,7 @@ public:
     void Periodic() override;
 
     void SetSpeed(units::revolutions_per_minute_t speed);
-    units::revolutions_per_minute_t GetLeftRPM() const;
+    units::revolutions_per_minute_t GetLeftSpeed() const;
     units::revolutions_per_minute_t GetRightSpeed() const;
 
     bool ReachedSpeed() const;
@@ -34,6 +34,6 @@ private:
     std::unique_ptr<frc::PIDController> m_rightPID;
 
     std::unique_ptr<frc::SimpleMotorFeedforward<units::radians>> m_feedForward;
-
+    
     units::radians_per_second_t m_targetSpeed {0};
 };

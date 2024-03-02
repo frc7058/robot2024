@@ -43,7 +43,7 @@ namespace constants
         constexpr units::meter_t moduleRadius = 0.38615_m;
         constexpr double driveGearRatio = 6.75;
 
-        constexpr double driveMeasurementFudgeFactor = 1.0; // To match expected real-world measurements
+        constexpr double driveMeasurementFudgeFactor = 0.975; // To match expected real-world measurements
         constexpr double angularVelocityFudgeFactor = 1.0; // To account for lateral drift
 
         // Drive encoder measurement values
@@ -111,7 +111,27 @@ namespace constants
     namespace intake
     {
         constexpr units::volt_t intakePower = 0.0_V;
-        constexpr units::volt_t feedToOuttakePower = 0.0_V;
+        constexpr units::volt_t feedToShooterPower = 0.0_V;
+    }
+
+    namespace shooter
+    {
+        units::revolutions_per_minute_t tolerance = 10.0_rpm;
+        units::volt_t maxVoltage = 12.0_V;
+
+        namespace pid 
+        {
+            constexpr double p = 0.0;
+            constexpr double i = 0.0;
+            constexpr double d = 0.0;
+        }
+
+        namespace feedforward 
+        {
+            constexpr double s = 0.0;
+            constexpr double v = 0.0;
+            constexpr double a = 0.0;
+        }
     }
 
     namespace preferences
@@ -164,6 +184,12 @@ namespace constants
             constexpr int front_right = 10;
             constexpr int back_left = 11;
             constexpr int back_right = 12;
+        }
+
+        namespace shooter_motor
+        {
+            constexpr int left = 0;
+            constexpr int right = 0;
         }
     }
 

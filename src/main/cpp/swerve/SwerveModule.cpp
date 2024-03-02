@@ -91,6 +91,7 @@ void SwerveModule::Periodic()
     units::radian_t angle = GetTurnAngle();
     units::volt_t turnOutput { m_turnPID->Calculate(angle) };
 
+    // if(turnOutput > 0.0_V)
     turnOutput += units::volt_t { m_turnPID_F * util::sign(turnOutput.value()) };
     turnOutput = std::clamp(turnOutput, -constants::drive::maxTurnVoltage, constants::drive::maxTurnVoltage);
 
