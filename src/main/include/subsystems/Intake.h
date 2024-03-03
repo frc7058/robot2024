@@ -1,12 +1,11 @@
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
+#include <frc/motorcontrol/Spark.h>
 #include <frc/DigitalInput.h>
 //#include <rev/CANSparkMax.h>
-#include <frc/motorcontrol/Spark.h>
 #include <units/voltage.h>
 #include <memory>
-#include "Constants.h"
 
 class Intake : public frc2::SubsystemBase
 {

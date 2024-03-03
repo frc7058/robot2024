@@ -116,8 +116,8 @@ namespace constants
 
     namespace shooter
     {
-        units::revolutions_per_minute_t tolerance = 10.0_rpm;
-        units::volt_t maxVoltage = 12.0_V;
+        constexpr units::revolutions_per_minute_t tolerance = 10.0_rpm;
+        constexpr units::volt_t maxVoltage = 12.0_V;
 
         namespace pid 
         {
@@ -128,9 +128,9 @@ namespace constants
 
         namespace feedforward 
         {
-            constexpr double s = 0.0;
-            constexpr double v = 0.0;
-            constexpr double a = 0.0;
+            constexpr auto s = 0.0_V; 
+            constexpr auto v = 0.0_V * 1.0_s / 1.0_rad;
+            constexpr auto a = 0.0_V * 1.0_s * 1.0_s / 1.0_rad;
         }
     }
 

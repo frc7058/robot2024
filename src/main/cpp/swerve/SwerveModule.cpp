@@ -1,6 +1,7 @@
 #include "swerve/SwerveModule.h"
-#include "Util.h"
-#include <fmt/color.h>
+#include "Constants.h"
+#include "lib/Util.h"
+
 #include <units/math.h>
 
 SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorCanID, int canCoderCanID, units::radian_t canCoderOffset)
@@ -43,6 +44,7 @@ SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorC
     m_turnPID->SetGoal(0_rad);
     m_turnPID->EnableContinuousInput(-constants::pi_radians, constants::pi_radians);
     // m_turnPID->SetTolerance(constants::drive::pid::turnPIDTolerance);
+    m_turnPID_F = constants::drive::pid::turnPID_F;
 
     m_driveFeedForward = std::make_unique<frc::SimpleMotorFeedforward<units::meters>>(
         constants::drive::feedforward::drive_S,
@@ -142,9 +144,6 @@ void SwerveModule::SetDriveMotorInverted(bool inverted)
 
 void SwerveModule::SetTurnAngle(units::radian_t angle)
 {
-    units::radian_t currentAngle = frc::AngleModulus(GetTurnAngle());
-    angle = frc::AngleModulus(angle);
-
     m_turnPID->SetGoal(frc::AngleModulus(angle));
 }
 

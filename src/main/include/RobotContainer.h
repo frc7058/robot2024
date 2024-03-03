@@ -6,9 +6,7 @@
 
 #include <frc2/command/CommandPtr.h>
 #include <frc/XboxController.h>
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/smartdashboard/SendableChooser.h>
-#include <frc2/command/Command.h>
+
 #include "subsystems/DriveBase.h"
 #include "subsystems/Intake.h"
 #include "subsystems/Shooter.h"

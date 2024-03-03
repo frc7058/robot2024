@@ -5,8 +5,6 @@
 #include "Robot.h"
 
 #include <frc2/command/CommandScheduler.h>
-#include <frc/Preferences.h>
-#include "Constants.h"
 
 void Robot::RobotInit() 
 {}

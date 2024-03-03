@@ -4,9 +4,8 @@
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <rev/CANSparkMax.h>
-#include <units/voltage.h>
+#include <units/angle.h>
 #include <memory>
-#include "Constants.h"
 
 class Shooter : public frc2::SubsystemBase
 {

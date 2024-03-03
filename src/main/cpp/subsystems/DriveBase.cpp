@@ -1,9 +1,12 @@
 #include "subsystems/DriveBase.h"
-#include <fmt/color.h>
+
 #include <frc/Preferences.h>
 #include <frc/DriverStation.h>
-#include <pathplanner/lib/auto/AutoBuilder.h>
+#include <frc/geometry/Translation2d.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <pathplanner/lib/auto/AutoBuilder.h>
+
+#include "Constants.h"
 
 DriveBase::DriveBase()
 {
@@ -51,7 +54,13 @@ DriveBase::DriveBase()
         fmt::print("NavX is not available: Field-oriented drive and odometry are disabled.\n");
     }
      
-    m_odometry = std::make_unique<frc::SwerveDriveOdometry<4>>(m_kinematics, GetHeading(), GetSwerveModulePositions());
+    m_kinematics = std::make_unique<frc::SwerveDriveKinematics<4>>(
+        frc::Translation2d( constants::drive::moduleDistanceX,  constants::drive::moduleDistanceY),
+        frc::Translation2d( constants::drive::moduleDistanceX, -constants::drive::moduleDistanceY),
+        frc::Translation2d(-constants::drive::moduleDistanceX,  constants::drive::moduleDistanceY),
+        frc::Translation2d(-constants::drive::moduleDistanceX, -constants::drive::moduleDistanceY));
+
+    m_odometry = std::make_unique<frc::SwerveDriveOdometry<4>>(*m_kinematics, GetHeading(), GetSwerveModulePositions());
 
     InitializePreferences();
 
@@ -122,10 +131,10 @@ void DriveBase::Drive(frc::ChassisSpeeds chassisSpeeds)
     chassisSpeeds = frc::ChassisSpeeds::Discretize(chassisSpeeds, 0.02_s);
     //chassisSpeeds.omega = angularVelocity;
 
-    wpi::array<frc::SwerveModuleState, 4> swerveModuleStates = m_kinematics.ToSwerveModuleStates(chassisSpeeds);
-    m_kinematics.DesaturateWheelSpeeds(&swerveModuleStates, constants::drive::maxDriveVelocity);
+    wpi::array<frc::SwerveModuleState, 4> swerveModuleStates = m_kinematics->ToSwerveModuleStates(chassisSpeeds);
+    m_kinematics->DesaturateWheelSpeeds(&swerveModuleStates, constants::drive::maxDriveVelocity);
 
-    for(int index = 0; index < m_swerveModules.size(); index++)
+    for(size_t index = 0; index < m_swerveModules.size(); index++)
     {
         frc::SwerveModuleState& moduleState = swerveModuleStates[index];
         units::radian_t currentTurnAngle = m_swerveModules[index]->GetTurnAngle();
@@ -210,7 +219,7 @@ void DriveBase::ResetPose(frc::Pose2d pose)
 
 frc::ChassisSpeeds DriveBase::GetChassisSpeeds() const
 {
-    return m_kinematics.ToChassisSpeeds(GetSwerveModuleStates());
+    return m_kinematics->ToChassisSpeeds(GetSwerveModuleStates());
 }
 
 wpi::array<frc::SwerveModuleState, 4> DriveBase::GetSwerveModuleStates() const

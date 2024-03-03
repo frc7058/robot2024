@@ -1,16 +1,15 @@
 #pragma once 
 
-#include <memory>
-#include <string>
-#include <ctre/phoenix6/CANcoder.hpp>
-#include <rev/CANSparkMax.h>
-#include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/PIDController.h>
+#include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
+#include <ctre/phoenix6/CANcoder.hpp>
+#include <rev/CANSparkMax.h>
 #include <units/velocity.h>
-#include "Constants.h"
+#include <memory>
+#include <string>
 
 class SwerveModule
 {
@@ -57,7 +56,7 @@ private:
 
     std::unique_ptr<frc::PIDController> m_drivePID {};
     std::unique_ptr<frc::ProfiledPIDController<units::radians>> m_turnPID {}; 
-    double m_turnPID_F {constants::drive::pid::turnPID_F};
+    double m_turnPID_F {};
     
     std::unique_ptr<frc::SimpleMotorFeedforward<units::meters>> m_driveFeedForward {};
 };

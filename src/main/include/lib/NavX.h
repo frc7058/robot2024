@@ -1,7 +1,6 @@
 #pragma once
 
 #include <AHRS.h>
-#include "Constants.h"
 
 class NavX
 {

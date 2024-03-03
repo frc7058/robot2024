@@ -1,19 +1,14 @@
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
-#include <frc/controller/ProfiledPIDController.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
-#include <frc/geometry/Translation2d.h>
-#include <frc/shuffleboard/Shuffleboard.h>
-#include <frc/shuffleboard/SimpleWidget.h>
 #include <array>
 
 #include "swerve/SwerveModule.h"
-#include "NavX.h"
-#include "Constants.h"
+#include "lib/NavX.h"
 
 class DriveBase : public frc2::SubsystemBase 
 {
@@ -50,11 +45,7 @@ public:
 
 private:
     // Swerve kinematics helper class 
-    frc::SwerveDriveKinematics<4> m_kinematics {
-        frc::Translation2d( constants::drive::moduleDistanceX,  constants::drive::moduleDistanceY),
-        frc::Translation2d( constants::drive::moduleDistanceX, -constants::drive::moduleDistanceY),
-        frc::Translation2d(-constants::drive::moduleDistanceX,  constants::drive::moduleDistanceY),
-        frc::Translation2d(-constants::drive::moduleDistanceX, -constants::drive::moduleDistanceY)};
+    std::unique_ptr<frc::SwerveDriveKinematics<4>> m_kinematics;
 
     // Swerve odometry
     std::unique_ptr<frc::SwerveDriveOdometry<4>> m_odometry {};

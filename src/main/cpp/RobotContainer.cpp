@@ -3,12 +3,15 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "RobotContainer.h"
+
 #include <frc2/command/Commands.h>
 #include <frc2/command/FunctionalCommand.h>
 #include <frc2/command/button/JoystickButton.h>
 #include <pathplanner/lib/commands/PathPlannerAuto.h>
+
+#include "Constants.h"
+#include "lib/Util.h"
 #include "commands/IntakeCommands.h"
-#include "Util.h"
 
 RobotContainer::RobotContainer() {
   ConfigureDriveControls();

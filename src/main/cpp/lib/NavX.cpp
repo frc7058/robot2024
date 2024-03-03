@@ -1,8 +1,9 @@
-#include "NavX.h"
+#include "lib/NavX.h"
+#include "Constants.h"
+
 #include <chrono>
 #include <thread>
 #include <string>
-#include <fmt/color.h>
 
 NavX::NavX()
 {
@@ -18,8 +19,9 @@ NavX::NavX()
         {
             const std::string error_text = "NavX could not connect/calibrate. Related functionalities will be disabled.";
 
+            // Add static error logging
             fmt::print("\n{}\n", std::string('-', error_text.length()));
-            fmt::print(fg(fmt::color::red), "{}\n", error_text);
+            fmt::print("{}\n", error_text);
             fmt::print("{}\n\n", std::string('-', error_text.length()));
 
             timeout = true;

@@ -1,4 +1,7 @@
 #include "subsystems/Shooter.h"
+#include "Constants.h"
+
+#include <units/voltage.h>
 
 Shooter::Shooter()
 {
@@ -49,7 +52,7 @@ void Shooter::Periodic()
     leftOutput += feedforwardOutput;
     leftOutput = std::clamp(leftOutput, -constants::shooter::maxVoltage, constants::shooter::maxVoltage);
 
-    units::volt_t rightOutput { m_rightPID->Calculate(leftRPM.value()) };
+    units::volt_t rightOutput { m_rightPID->Calculate(rightRPM.value()) };
     rightOutput += feedforwardOutput;
     rightOutput = std::clamp(leftOutput, -constants::shooter::maxVoltage, constants::shooter::maxVoltage);
     
