@@ -61,7 +61,7 @@ void Shooter::Periodic()
     m_rightMotor->SetVoltage(rightOutput);
 }
 
-void Shooter::SetSpeed(units::revolutions_per_minute_t speed)
+void Shooter::SetSpeed(const units::revolutions_per_minute_t speed)
 {
     m_leftPID->SetSetpoint(speed.value());
     m_rightPID->SetSetpoint(speed.value());
@@ -79,7 +79,7 @@ units::revolutions_per_minute_t Shooter::GetRightSpeed() const
     return units::revolutions_per_minute_t { m_rightEncoder->GetVelocity() };
 }
 
-bool Shooter::ReachedSpeed() const 
+bool Shooter::AtSpeed() const 
 {
     return m_leftPID->AtSetpoint() && m_rightPID->AtSetpoint();
 }

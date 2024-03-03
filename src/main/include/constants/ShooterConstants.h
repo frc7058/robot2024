@@ -3,6 +3,7 @@
 #include <units/voltage.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
+#include <units/time.h>
 
 namespace constants 
 {
@@ -13,6 +14,9 @@ namespace constants
 
         // Shooter velocity control tolerance
         constexpr units::revolutions_per_minute_t tolerance = 10.0_rpm;
+
+        // Maximum time to wait for shooter wheels to reach desired speed
+        constexpr units::second_t speedControlTimeout = 1.0_s;
 
         // PID constants 
         namespace pid 

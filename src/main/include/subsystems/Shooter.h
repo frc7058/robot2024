@@ -14,11 +14,11 @@ public:
 
     void Periodic() override;
 
-    void SetSpeed(units::revolutions_per_minute_t speed);
+    void SetSpeed(const units::revolutions_per_minute_t speed);
     units::revolutions_per_minute_t GetLeftSpeed() const;
     units::revolutions_per_minute_t GetRightSpeed() const;
 
-    bool ReachedSpeed() const;
+    bool AtSpeed() const;
 
     void Stop();
 

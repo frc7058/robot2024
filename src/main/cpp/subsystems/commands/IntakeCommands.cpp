@@ -1,36 +1,40 @@
 #include "commands/IntakeCommands.h"
 #include "constants/IntakeConstants.h"
+#include <frc2/command/FunctionalCommand.h>
 
-frc2::CommandPtr RunIntakeCommand(Intake* intake)
+namespace IntakeCommands 
 {
-    return frc2::FunctionalCommand(
-        // Initialize
-        [intake] { intake->RunIntake(constants::intake::intakePower); },
+    frc2::CommandPtr RunIntake(Intake* intake)
+    {
+        return frc2::FunctionalCommand(
+            // Initialize
+            [intake] { intake->RunIntake(constants::intake::intakePower); },
 
-        // Periodic
-        [intake] {},
+            // Periodic
+            [intake] {},
 
-        // OnEnd
-        [intake] (bool interrupted) { intake->StopIntake(); },
+            // OnEnd
+            [intake] (bool interrupted) { intake->StopIntake(); },
 
-        // IsFinished
-        [intake] { return intake->IsNoteDetected(); },
+            // IsFinished
+            [intake] { return intake->IsNoteDetected(); },
 
-        // Requirements
-        {intake}
-    ).ToPtr();
-}
+            // Requirements
+            {intake}
+        ).ToPtr();
+    }
 
-frc2::CommandPtr FeedShooterCommand(Intake* intake)
-{
-    return frc2::cmd::StartEnd(
-        // Start
-        [intake] { intake->RunIntake(constants::intake::feedToShooterPower); },
+    frc2::CommandPtr FeedShooter(Intake* intake)
+    {
+        return frc2::cmd::StartEnd(
+            // Start
+            [intake] { intake->RunIntake(constants::intake::feedToShooterPower); },
 
-        // End
-        [intake] { intake->StopIntake(); },
+            // End
+            [intake] { intake->StopIntake(); },
 
-        // Requirements
-        {intake}
-    ).WithTimeout(0.5_s);
+            // Requirements
+            {intake}
+        ).WithTimeout(constants::intake::feedToShooterTime);
+    }
 }

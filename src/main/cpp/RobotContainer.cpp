@@ -41,7 +41,7 @@ void RobotContainer::ConfigureShooterControls()
 {
   // Run intake while A is held
   frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kA)
-    .WhileTrue(RunIntakeCommand(&m_intake));
+    .WhileTrue(IntakeCommands::RunIntake(&m_intake));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
