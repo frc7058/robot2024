@@ -6,7 +6,11 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
 
-#include "Constants.h"
+//#include "Constants.h"
+#include "constants/Ports.h"
+#include "constants/DriveConstants.h"
+#include "constants/PhysicalConstants.h"
+#include "constants/AutoConstants.h"
 
 DriveBase::DriveBase()
 {
@@ -17,32 +21,32 @@ DriveBase::DriveBase()
 
     m_swerveModules[0] = std::move(std::make_unique<SwerveModule>(
         "Swerve Module (FL)", 
-        constants::can_ports::drive_motor::front_left, 
-        constants::can_ports::turn_motor::front_left, 
-        constants::can_ports::can_coder::front_left, 
-        constants::drive::encoder_offsets::frontLeft));
+        ports::drive::driveMotorCAN::frontLeft,
+        ports::drive::turnMotorCAN::frontLeft,
+        ports::drive::CANCoder::frontLeft,
+        constants::drive::encoderOffsets::frontLeft));
 
     m_swerveModules[1] = std::move(std::make_unique<SwerveModule>(
         "Swerve Module (FR)", 
-        constants::can_ports::drive_motor::front_right, 
-        constants::can_ports::turn_motor::front_right, 
-        constants::can_ports::can_coder::front_right, 
-        constants::drive::encoder_offsets::frontRight));
+        ports::drive::driveMotorCAN::frontRight, 
+        ports::drive::turnMotorCAN::frontRight, 
+        ports::drive::CANCoder::frontRight,
+        constants::drive::encoderOffsets::frontRight));
     m_swerveModules[1]->SetDriveMotorInverted(true);
 
     m_swerveModules[2] = std::move(std::make_unique<SwerveModule>(
         "Swerve Module (BL)", 
-        constants::can_ports::drive_motor::back_left, 
-        constants::can_ports::turn_motor::back_left, 
-        constants::can_ports::can_coder::back_left, 
-        constants::drive::encoder_offsets::backLeft));
+        ports::drive::driveMotorCAN::backLeft, 
+        ports::drive::turnMotorCAN::backLeft, 
+        ports::drive::CANCoder::backLeft,
+        constants::drive::encoderOffsets::backLeft));
 
     m_swerveModules[3] = std::move(std::make_unique<SwerveModule>(
         "Swerve Module (BR)", 
-        constants::can_ports::drive_motor::back_right, 
-        constants::can_ports::turn_motor::back_right, 
-        constants::can_ports::can_coder::back_right, 
-        constants::drive::encoder_offsets::backRight));
+        ports::drive::driveMotorCAN::backRight,
+        ports::drive::turnMotorCAN::backRight,
+        ports::drive::CANCoder::backRight,
+        constants::drive::encoderOffsets::backRight));
     m_swerveModules[3]->SetDriveMotorInverted(true);
 
     if(m_navX.IsAvailable())
@@ -55,10 +59,10 @@ DriveBase::DriveBase()
     }
      
     m_kinematics = std::make_unique<frc::SwerveDriveKinematics<4>>(
-        frc::Translation2d( constants::drive::moduleDistanceX,  constants::drive::moduleDistanceY),
-        frc::Translation2d( constants::drive::moduleDistanceX, -constants::drive::moduleDistanceY),
-        frc::Translation2d(-constants::drive::moduleDistanceX,  constants::drive::moduleDistanceY),
-        frc::Translation2d(-constants::drive::moduleDistanceX, -constants::drive::moduleDistanceY));
+        frc::Translation2d( constants::physical::moduleDistanceX,  constants::physical::moduleDistanceY),
+        frc::Translation2d( constants::physical::moduleDistanceX, -constants::physical::moduleDistanceY),
+        frc::Translation2d(-constants::physical::moduleDistanceX,  constants::physical::moduleDistanceY),
+        frc::Translation2d(-constants::physical::moduleDistanceX, -constants::physical::moduleDistanceY));
 
     m_odometry = std::make_unique<frc::SwerveDriveOdometry<4>>(*m_kinematics, GetHeading(), GetSwerveModulePositions());
 
@@ -78,7 +82,7 @@ DriveBase::DriveBase()
         [this] (frc::ChassisSpeeds robotRelativeSpeeds) { this->Drive(robotRelativeSpeeds); },
 
         // Path follower config
-        constants::drive::pathFollowerConfig,
+        constants::autonomous::pathFollowerConfig,
 
         // Boolean supplier for path mirroring
         [] () {
@@ -244,46 +248,48 @@ wpi::array<frc::SwerveModulePosition, 4> DriveBase::GetSwerveModulePositions() c
 
 void DriveBase::InitializePreferences()
 {
-    frc::Preferences::InitDouble(constants::preferences::driveP_Key, constants::drive::pid::drivePID_P);
-    frc::Preferences::InitDouble(constants::preferences::driveI_Key, constants::drive::pid::drivePID_I);
-    frc::Preferences::InitDouble(constants::preferences::driveD_Key, constants::drive::pid::drivePID_D);
-    frc::Preferences::InitDouble(constants::preferences::driveFF_S_Key, constants::drive::feedforward::drive_S.value());
-    frc::Preferences::InitDouble(constants::preferences::driveFF_V_Key, constants::drive::feedforward::drive_V.value());
+    frc::Preferences::InitDouble(constants::drive::preferences::driveP_Key, constants::drive::drivePID::p);
+    frc::Preferences::InitDouble(constants::drive::preferences::driveI_Key, constants::drive::drivePID::i);
+    frc::Preferences::InitDouble(constants::drive::preferences::driveD_Key, constants::drive::drivePID::d);
+    frc::Preferences::InitDouble(constants::drive::preferences::driveFF_S_Key, constants::drive::driveFF::s.value());
+    frc::Preferences::InitDouble(constants::drive::preferences::driveFF_V_Key, constants::drive::driveFF::v.value());
     
-    frc::Preferences::InitDouble(constants::preferences::turnP_Key, constants::drive::pid::turnPID_P);
-    frc::Preferences::InitDouble(constants::preferences::turnI_Key, constants::drive::pid::turnPID_I);
-    frc::Preferences::InitDouble(constants::preferences::turnD_Key, constants::drive::pid::turnPID_D);
-    frc::Preferences::InitDouble(constants::preferences::turnF_Key, constants::drive::pid::turnPID_F);
-    frc::Preferences::InitDouble(constants::preferences::turnV_Key, constants::drive::pid::turnPID_V.value());
-    frc::Preferences::InitDouble(constants::preferences::turnA_Key, constants::drive::pid::turnPID_A.value());
+    frc::Preferences::InitDouble(constants::drive::preferences::turnP_Key, constants::drive::turnPID::p);
+    frc::Preferences::InitDouble(constants::drive::preferences::turnI_Key, constants::drive::turnPID::i);
+    frc::Preferences::InitDouble(constants::drive::preferences::turnD_Key, constants::drive::turnPID::d);
+    frc::Preferences::InitDouble(constants::drive::preferences::turnF_Key, constants::drive::turnPID::f);
+    frc::Preferences::InitDouble(constants::drive::preferences::turnV_Key, constants::drive::turnPID::maxVelocity.value());
+    frc::Preferences::InitDouble(constants::drive::preferences::turnA_Key, constants::drive::turnPID::maxAcceleration.value());
 
-    frc::Preferences::InitDouble(constants::preferences::offsetFL_Key, constants::drive::encoder_offsets::frontLeft.value());
-    frc::Preferences::InitDouble(constants::preferences::offsetFR_Key, constants::drive::encoder_offsets::frontRight.value());
-    frc::Preferences::InitDouble(constants::preferences::offsetBL_Key, constants::drive::encoder_offsets::backLeft.value());
-    frc::Preferences::InitDouble(constants::preferences::offsetBR_Key, constants::drive::encoder_offsets::backRight.value());
+    /*
+    frc::Preferences::InitDouble(constants::drive::preferences::offsetFL_Key, constants::drive::encoder_offsets::frontLeft.value());
+    frc::Preferences::InitDouble(constants::drive::preferences::offsetFR_Key, constants::drive::encoder_offsets::frontRight.value());
+    frc::Preferences::InitDouble(constants::drive::preferences::offsetBL_Key, constants::drive::encoder_offsets::backLeft.value());
+    frc::Preferences::InitDouble(constants::drive::preferences::offsetBR_Key, constants::drive::encoder_offsets::backRight.value());
+    */
 
     LoadPreferences();
 }
 
 void DriveBase::LoadPreferences()
 {
-    double driveP = frc::Preferences::GetDouble(constants::preferences::driveP_Key);
-    double driveI = frc::Preferences::GetDouble(constants::preferences::driveI_Key);
-    double driveD = frc::Preferences::GetDouble(constants::preferences::driveD_Key);
-    double driveFF_S = frc::Preferences::GetDouble(constants::preferences::driveFF_S_Key);
-    double driveFF_V = frc::Preferences::GetDouble(constants::preferences::driveFF_V_Key);
+    double driveP = frc::Preferences::GetDouble(constants::drive::preferences::driveP_Key);
+    double driveI = frc::Preferences::GetDouble(constants::drive::preferences::driveI_Key);
+    double driveD = frc::Preferences::GetDouble(constants::drive::preferences::driveD_Key);
+    double driveFF_S = frc::Preferences::GetDouble(constants::drive::preferences::driveFF_S_Key);
+    double driveFF_V = frc::Preferences::GetDouble(constants::drive::preferences::driveFF_V_Key);
 
-    double turnP = frc::Preferences::GetDouble(constants::preferences::turnP_Key);
-    double turnI = frc::Preferences::GetDouble(constants::preferences::turnI_Key);
-    double turnD = frc::Preferences::GetDouble(constants::preferences::turnD_Key);
-    double turnF = frc::Preferences::GetDouble(constants::preferences::turnF_Key);
-    units::radians_per_second_t turnV { frc::Preferences::GetDouble(constants::preferences::turnV_Key) };
-    units::radians_per_second_squared_t turnA { frc::Preferences::GetDouble(constants::preferences::turnA_Key) };
+    double turnP = frc::Preferences::GetDouble(constants::drive::preferences::turnP_Key);
+    double turnI = frc::Preferences::GetDouble(constants::drive::preferences::turnI_Key);
+    double turnD = frc::Preferences::GetDouble(constants::drive::preferences::turnD_Key);
+    double turnF = frc::Preferences::GetDouble(constants::drive::preferences::turnF_Key);
+    units::radians_per_second_t turnV { frc::Preferences::GetDouble(constants::drive::preferences::turnV_Key) };
+    units::radians_per_second_squared_t turnA { frc::Preferences::GetDouble(constants::drive::preferences::turnA_Key) };
 
-    units::radian_t offsetFL { frc::Preferences::GetDouble(constants::preferences::offsetFL_Key) };
-    units::radian_t offsetFR { frc::Preferences::GetDouble(constants::preferences::offsetFR_Key) };
-    units::radian_t offsetBL { frc::Preferences::GetDouble(constants::preferences::offsetBL_Key) };
-    units::radian_t offsetBR { frc::Preferences::GetDouble(constants::preferences::offsetBR_Key) };
+    // units::radian_t offsetFL { frc::Preferences::GetDouble(constants::preferences::offsetFL_Key) };
+    // units::radian_t offsetFR { frc::Preferences::GetDouble(constants::preferences::offsetFR_Key) };
+    // units::radian_t offsetBL { frc::Preferences::GetDouble(constants::preferences::offsetBL_Key) };
+    // units::radian_t offsetBR { frc::Preferences::GetDouble(constants::preferences::offsetBR_Key) };
 
     for(std::unique_ptr<SwerveModule>& swerveModule : m_swerveModules)
     {
@@ -291,8 +297,8 @@ void DriveBase::LoadPreferences()
         swerveModule->UpdateTurnController(turnP, turnI, turnD, turnF, turnV, turnA);
     }
 
-    m_swerveModules[0]->UpdateTurnEncoderOffset(offsetFL);
-    m_swerveModules[1]->UpdateTurnEncoderOffset(offsetFR);
-    m_swerveModules[2]->UpdateTurnEncoderOffset(offsetBL);
-    m_swerveModules[3]->UpdateTurnEncoderOffset(offsetBR);
+    // m_swerveModules[0]->UpdateTurnEncoderOffset(offsetFL);
+    // m_swerveModules[1]->UpdateTurnEncoderOffset(offsetFR);
+    // m_swerveModules[2]->UpdateTurnEncoderOffset(offsetBL);
+    // m_swerveModules[3]->UpdateTurnEncoderOffset(offsetBR);
 }

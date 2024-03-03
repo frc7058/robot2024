@@ -9,7 +9,8 @@
 #include <frc2/command/button/JoystickButton.h>
 #include <pathplanner/lib/commands/PathPlannerAuto.h>
 
-#include "Constants.h"
+#include "constants/GeneralConstants.h"
+#include "constants/DriveConstants.h"
 #include "lib/Util.h"
 #include "commands/IntakeCommands.h"
 

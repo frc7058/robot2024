@@ -1,7 +1,8 @@
 #include "swerve/SwerveModule.h"
-#include "Constants.h"
+#include "constants/GeneralConstants.h"
+#include "constants/DriveConstants.h"
+#include "constants/PhysicalConstants.h"
 #include "lib/Util.h"
-
 #include <units/math.h>
 
 SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorCanID, int canCoderCanID, units::radian_t canCoderOffset)
@@ -21,35 +22,35 @@ SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorC
     m_driveEncoder->SetAverageDepth(constants::drive::driveEncoderDepth);
     m_driveEncoder->SetMeasurementPeriod(constants::drive::driveEncoderPeriod);
 
-    units::meter_t positionConversionFactor = constants::drive::wheelCircumference / (constants::drive::driveGearRatio);
+    units::meter_t positionConversionFactor = constants::physical::wheelCircumference / (constants::physical::driveGearRatio) * constants::drive::driveMeasurementFudgeFactor;
     m_driveEncoder->SetPositionConversionFactor(positionConversionFactor.value());
     
-    units::meter_t velocityConversionFactor = constants::drive::wheelCircumference / (constants::drive::driveGearRatio * 60.0);
+    units::meter_t velocityConversionFactor = positionConversionFactor / 60.0;
     m_driveEncoder->SetVelocityConversionFactor(velocityConversionFactor.value());
 
     m_drivePID = std::make_unique<frc::PIDController>(
-        constants::drive::pid::drivePID_P,
-        constants::drive::pid::drivePID_I,
-        constants::drive::pid::drivePID_D);
+        constants::drive::drivePID::p,
+        constants::drive::drivePID::i,
+        constants::drive::drivePID::d);
     m_drivePID->SetSetpoint(0);
 
     m_turnPID = std::make_unique<frc::ProfiledPIDController<units::radians>>(
-        constants::drive::pid::turnPID_P, 
-        constants::drive::pid::turnPID_I, 
-        constants::drive::pid::turnPID_D, 
+        constants::drive::turnPID::p,
+        constants::drive::turnPID::i,
+        constants::drive::turnPID::d,
         frc::TrapezoidProfile<units::radians>::Constraints {
-           constants::drive::pid::turnPID_V,
-           constants::drive::pid::turnPID_A
+           constants::drive::turnPID::maxVelocity,
+           constants::drive::turnPID::maxAcceleration
         });
     m_turnPID->SetGoal(0_rad);
     m_turnPID->EnableContinuousInput(-constants::pi_radians, constants::pi_radians);
-    // m_turnPID->SetTolerance(constants::drive::pid::turnPIDTolerance);
-    m_turnPID_F = constants::drive::pid::turnPID_F;
+    //m_turnPID->SetTolerance(constants::drive::turnPID::tolerance);
+    m_turnPID_F = constants::drive::turnPID::f;
 
     m_driveFeedForward = std::make_unique<frc::SimpleMotorFeedforward<units::meters>>(
-        constants::drive::feedforward::drive_S,
-        constants::drive::feedforward::drive_V,
-        constants::drive::feedforward::drive_A);
+        constants::drive::driveFF::s,
+        constants::drive::driveFF::v,
+        constants::drive::driveFF::a);
 
     // Check if the motors or encoders have detected faults
     bool faults_detected = ((m_driveMotor->GetStickyFaults() & m_turnMotor->GetStickyFaults() & m_turnEncoder->GetStickyFaultField().GetValue()) == 0);
@@ -171,7 +172,7 @@ void SwerveModule::UpdateDriveController(double p, double i, double d, double ff
     m_driveFeedForward.reset(new frc::SimpleMotorFeedforward<units::meters>(
         ff_S * 1.0_V,
         ff_V * 1.0_V * 1.0_s / 1.0_m,
-        constants::drive::feedforward::drive_A
+        constants::drive::driveFF::a
     ));
 }
 

@@ -1,5 +1,6 @@
 #include "subsystems/Shooter.h"
-#include "Constants.h"
+#include "constants/ShooterConstants.h"
+#include "constants/Ports.h"
 
 #include <units/voltage.h>
 
@@ -8,11 +9,11 @@ Shooter::Shooter()
     fmt::print("\nInitializing Shooter...\n");
 
     m_leftMotor = std::make_unique<rev::CANSparkMax>(
-        constants::can_ports::shooter_motor::left, 
+        ports::shooter::leftMotorCAN,
         rev::CANSparkBase::MotorType::kBrushless);
 
     m_rightMotor = std::make_unique<rev::CANSparkMax>(
-        constants::can_ports::shooter_motor::right, 
+        ports::shooter::rightMotorCAN,
         rev::CANSparkBase::MotorType::kBrushless);
 
     m_leftEncoder = std::make_unique<rev::SparkRelativeEncoder>(m_leftMotor->GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor));

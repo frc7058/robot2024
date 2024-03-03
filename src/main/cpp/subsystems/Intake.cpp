@@ -1,13 +1,14 @@
 #include "subsystems/Intake.h"
-#include "Constants.h"
+#include "constants/IntakeConstants.h"
+#include "constants/Ports.h"
 
 Intake::Intake()
 {
     fmt::print("\nInitializing Intake...\n");
 
     //m_intakeMotor = std::make_unique<rev::CANSparkMax>(0, rev::CANSparkMax::MotorType::kBrushless);
-    m_intakeMotor = std::make_unique<frc::Spark>(constants::pwm_channels::intakeMotor);
-    m_photoElectricSensor = std::make_unique<frc::DigitalInput>(constants::dio_ports::photoElectricSensor);
+    m_intakeMotor = std::make_unique<frc::Spark>(ports::intake::intakeMotorPWM);
+    m_photoElectricSensor = std::make_unique<frc::DigitalInput>(ports::dio::photoElectricSensor);
 
     fmt::print("Intake Initialization complete\n\n");
 }

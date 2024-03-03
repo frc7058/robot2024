@@ -1,5 +1,5 @@
 #include "lib/NavX.h"
-#include "Constants.h"
+#include "constants/GeneralConstants.h"
 
 #include <chrono>
 #include <thread>
@@ -12,10 +12,12 @@ NavX::NavX()
     auto start = clock::now();
     bool timeout = false;
 
+    std::chrono::seconds timeoutLimit { constants::navXTimeoutSeconds };
+
     while(m_navX.IsCalibrating() || !m_navX.IsConnected())
     {
         auto elapsed_time = clock::now() - start;
-        if(elapsed_time >= constants::navXTimeout)
+        if(elapsed_time >= timeoutLimit)
         {
             const std::string error_text = "NavX could not connect/calibrate. Related functionalities will be disabled.";
 
