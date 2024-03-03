@@ -5,14 +5,17 @@
 #include "RobotContainer.h"
 #include <frc2/command/Commands.h>
 #include <frc2/command/FunctionalCommand.h>
+#include <frc2/command/button/JoystickButton.h>
 #include <pathplanner/lib/commands/PathPlannerAuto.h>
+#include "commands/IntakeCommands.h"
 #include "Util.h"
 
 RobotContainer::RobotContainer() {
-  ConfigureBindings();
+  ConfigureDriveControls();
+  ConfigureShooterControls();
 }
 
-void RobotContainer::ConfigureBindings() 
+void RobotContainer::ConfigureDriveControls() 
 {
   m_driveBase.SetDefaultCommand(frc2::cmd::Run(
     [this] {
@@ -28,6 +31,13 @@ void RobotContainer::ConfigureBindings()
     },
     {&m_driveBase}
   ));
+}
+
+void RobotContainer::ConfigureShooterControls()
+{
+  // Run intake while A is held
+  frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kA)
+    .WhileTrue(RunIntakeCommand(&m_intake));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {

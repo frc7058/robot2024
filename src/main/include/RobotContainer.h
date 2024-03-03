@@ -10,6 +10,8 @@
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
 #include "subsystems/DriveBase.h"
+#include "subsystems/Intake.h"
+#include "subsystems/Shooter.h"
 
 class RobotContainer {
  public:
@@ -21,9 +23,13 @@ class RobotContainer {
   void TestPeriodic();
 
  private:
-  void ConfigureBindings();
+  void ConfigureDriveControls();
+  void ConfigureShooterControls();
 
   frc::XboxController m_driveController {0};
+  frc::XboxController m_shooterController {1};
   
   DriveBase m_driveBase {};
+  Intake m_intake {};
+  Shooter m_shooter {};
 };
