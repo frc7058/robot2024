@@ -130,6 +130,34 @@ void DriveBase::Drive(units::meters_per_second_t velocityX, units::meters_per_se
 
 void DriveBase::Drive(frc::ChassisSpeeds chassisSpeeds)
 {
+    /* 
+    // Lock heading if not commanded to rotate
+    if(chassisSpeeds.omega == 0.0_rad_per_s && !IsHeadingLocked())
+    {
+        LockHeading();
+    }
+    else 
+    {
+        UnlockHeading();
+    }
+
+    // If heading is locked or currently tracking an object, rotate towards
+    if(m_headingLocked || m_tracking)
+    {
+        units::radian_t currentHeading = frc::AngleModulus(GetHeading());
+        units::radians_per_second_t outputAngularVelocity { m_headingPID->Calculate(currentHeading.value()) };
+
+        if(m_headingPID->AtSetpoint())
+        {
+            chassisSpeeds.omega = 0.0_rad_per_s;
+        }
+        else 
+        {
+            chassisSpeeds.omega = outputAngularVelocity;
+        }
+    } 
+    */
+
     //units::radians_per_second_t angularVelocity = chassisSpeeds.omega;
     //chassisSpeeds.omega *= constants::drive::angularVelocityFudgeFactor;
     chassisSpeeds = frc::ChassisSpeeds::Discretize(chassisSpeeds, 0.02_s);
@@ -192,6 +220,42 @@ void DriveBase::SetTargetModuleStates(const wpi::array<frc::SwerveModuleState, 4
         }
         */
     }
+}
+
+void DriveBase::TrackObject(units::radian_t heading)
+{
+    heading = frc::AngleModulus(heading);
+    m_headingPID->SetSetpoint(heading.value());
+    m_tracking = true;
+}
+
+void DriveBase::DisableTracking()
+{
+    m_tracking = false;
+}
+
+void DriveBase::LockHeading()
+{
+    // Tracking takes precedence over locking
+    if(m_tracking)
+    {
+        m_headingLocked = false;
+        return;
+    }
+
+    units::radian_t currentHeading = frc::AngleModulus(GetHeading());
+    m_headingPID->SetSetpoint(currentHeading.value());
+    m_headingLocked = true;
+}
+
+void DriveBase::UnlockHeading()
+{
+    m_headingLocked = false;
+}
+
+bool DriveBase::IsHeadingLocked() const
+{
+    return m_headingLocked;
 }
 
 units::radian_t DriveBase::GetHeading()
