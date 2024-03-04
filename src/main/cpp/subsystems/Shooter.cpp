@@ -61,12 +61,23 @@ void Shooter::Periodic()
     m_rightMotor->SetVoltage(rightOutput);
 }
 
-void Shooter::SetSpeed(const units::revolutions_per_minute_t speed)
+void Shooter::SetShooterSpeed(const units::revolutions_per_minute_t speed)
 {
     m_leftPID->SetSetpoint(speed.value());
     m_rightPID->SetSetpoint(speed.value());
 
     m_targetSpeed = units::convert<units::revolutions_per_minute, units::radians_per_second>(speed);
+}
+
+void Shooter::StopShooter()
+{
+    m_leftPID->SetSetpoint(0);
+    m_rightPID->SetSetpoint(0);
+
+    m_targetSpeed = units::radians_per_second_t {0};
+
+    m_leftMotor->StopMotor();
+    m_rightMotor->StopMotor();
 }
 
 units::revolutions_per_minute_t Shooter::GetLeftSpeed() const
@@ -79,18 +90,17 @@ units::revolutions_per_minute_t Shooter::GetRightSpeed() const
     return units::revolutions_per_minute_t { m_rightEncoder->GetVelocity() };
 }
 
+void Shooter::RunFeeder(const units::volt_t voltage)
+{
+    m_feedMotor->SetVoltage(voltage);
+}
+
+void Shooter::StopFeeder()
+{
+    m_feedMotor->StopMotor();
+}
+
 bool Shooter::AtSpeed() const 
 {
     return m_leftPID->AtSetpoint() && m_rightPID->AtSetpoint();
-}
-
-void Shooter::Stop()
-{
-    m_leftPID->SetSetpoint(0);
-    m_rightPID->SetSetpoint(0);
-
-    m_targetSpeed = units::radians_per_second_t {0};
-
-    m_leftMotor->StopMotor();
-    m_rightMotor->StopMotor();
 }

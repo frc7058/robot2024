@@ -222,6 +222,7 @@ void DriveBase::SetTargetModuleStates(const wpi::array<frc::SwerveModuleState, 4
     }
 }
 
+/*
 void DriveBase::TrackObject(units::radian_t heading)
 {
     heading = frc::AngleModulus(heading);
@@ -257,6 +258,7 @@ bool DriveBase::IsHeadingLocked() const
 {
     return m_headingLocked;
 }
+*/
 
 units::radian_t DriveBase::GetHeading()
 {

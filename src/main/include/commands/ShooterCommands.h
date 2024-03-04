@@ -13,6 +13,12 @@ namespace ShooterCommands
     // Stops the shooter wheels 
     frc2::CommandPtr StopShooterWheels(Shooter* shooter);
 
+    // Runs the feeder wheel 
+    frc2::CommandPtr RunFeeder(Shooter* shooter);
+
+    // Stops the feeder wheel
+    frc2::CommandPtr StopFeeder(Shooter* shooter);
+
     // Shoots a note at a specified speed
     frc2::CommandPtr Shoot(Shooter* shooter, Intake* intake, units::revolutions_per_minute_t speed);
 }

@@ -13,6 +13,7 @@
 #include "constants/DriveConstants.h"
 #include "lib/Util.h"
 #include "commands/IntakeCommands.h"
+#include "commands/ShooterCommands.h"
 
 RobotContainer::RobotContainer() {
   ConfigureDriveControls();
@@ -42,9 +43,20 @@ void RobotContainer::ConfigureShooterControls()
   // Run intake while A is held
   frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kA)
     .WhileTrue(IntakeCommands::RunIntake(&m_intake));
+
+  frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kB)
+    .WhileTrue(IntakeCommands::Eject(&m_intake));
+
+  // frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kRightBumper)
+  //   .OnTrue(ShooterCommands::Shoot(&m_shooter, &m_intake, 600_rpm));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   return pathplanner::PathPlannerAuto("name").ToPtr();
   //return frc2::cmd::Print("No autonomous command configured");
+}
+
+void RobotContainer::TeleopPeriodic()
+{
+  //m_intakeMotor.SetVoltage(6.0_V);
 }

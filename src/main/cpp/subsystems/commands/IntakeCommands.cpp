@@ -17,7 +17,7 @@ namespace IntakeCommands
             [intake] (bool interrupted) { intake->StopIntake(); },
 
             // IsFinished
-            [intake] { return intake->IsNoteDetected(); },
+            [intake] { return false; /* return intake->IsNoteDetected(); */ },
 
             // Requirements
             {intake}
@@ -36,5 +36,19 @@ namespace IntakeCommands
             // Requirements
             {intake}
         ).WithTimeout(constants::intake::feedToShooterTime);
+    }
+
+    frc2::CommandPtr Eject(Intake* intake)
+    {
+        return frc2::cmd::StartEnd(
+            // Start 
+            [intake] { intake->RunIntake(constants::intake::ejectPower); },
+
+            // End
+            [intake] { intake->StopIntake(); },
+
+            // Requirements
+            {intake}
+        );
     }
 }

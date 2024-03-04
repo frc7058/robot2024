@@ -12,5 +12,5 @@ namespace IntakeCommands
     frc2::CommandPtr FeedShooter(Intake* intake);
 
     // Eject note from intake
-    // frc2::CommandPtr Eject(Intake* intake);
+    frc2::CommandPtr Eject(Intake* intake);
 }

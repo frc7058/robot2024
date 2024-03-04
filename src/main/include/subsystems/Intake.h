@@ -1,9 +1,8 @@
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
-#include <frc/motorcontrol/Spark.h>
 #include <frc/DigitalInput.h>
-//#include <rev/CANSparkMax.h>
+#include <rev/CANSparkMax.h>
 #include <units/voltage.h>
 #include <memory>
 
@@ -20,7 +19,6 @@ public:
     bool IsNoteDetected() const;
 
 private:
-    //std::unique_ptr<rev::CANSparkMax> m_intakeMotor;
-    std::unique_ptr<frc::Spark> m_intakeMotor;
-    std::unique_ptr<frc::DigitalInput> m_photoElectricSensor; 
+    std::unique_ptr<rev::CANSparkMax> m_intakeMotor;
+    //std::unique_ptr<frc::DigitalInput> m_photoElectricSensor; 
 };

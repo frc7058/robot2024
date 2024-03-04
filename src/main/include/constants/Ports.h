@@ -31,17 +31,18 @@ namespace ports
 
     namespace intake 
     {
-        constexpr int intakeMotorPWM = 0;
+        constexpr int intakeMotorCAN = 13;
     }
 
     namespace shooter 
     {
-        constexpr int leftMotorCAN = 0;
-        constexpr int rightMotorCAN = 0;
+        constexpr int feedMotorCAN = 14;
+        constexpr int leftMotorCAN = 15;
+        constexpr int rightMotorCAN = 16;
     }
 
     namespace dio 
     {
-        constexpr int photoElectricSensor = 0;
+        // constexpr int photoElectricSensor = 0;
     }
 }

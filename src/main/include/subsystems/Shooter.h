@@ -14,15 +14,18 @@ public:
 
     void Periodic() override;
 
-    void SetSpeed(const units::revolutions_per_minute_t speed);
+    void SetShooterSpeed(const units::revolutions_per_minute_t speed);
+    void StopShooter();
     units::revolutions_per_minute_t GetLeftSpeed() const;
     units::revolutions_per_minute_t GetRightSpeed() const;
 
+    void RunFeeder(const units::volt_t voltage);
+    void StopFeeder();
+
     bool AtSpeed() const;
 
-    void Stop();
-
 private:
+    std::unique_ptr<rev::CANSparkMax> m_feedMotor;
     std::unique_ptr<rev::CANSparkMax> m_leftMotor;
     std::unique_ptr<rev::CANSparkMax> m_rightMotor;
     
