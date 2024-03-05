@@ -6,7 +6,10 @@ Intake::Intake()
 {
     fmt::print("\nInitializing Intake...\n");
 
-    m_intakeMotor = std::make_unique<rev::CANSparkMax>(ports::intake::intakeMotorCAN, rev::CANSparkMax::MotorType::kBrushless);
+    m_intakeMotor = std::make_unique<rev::CANSparkMax>(
+        ports::intake::intakeMotorCAN, 
+        rev::CANSparkMax::MotorType::kBrushless);
+    m_intakeMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
     //m_photoElectricSensor = std::make_unique<frc::DigitalInput>(ports::dio::photoElectricSensor);
 
     fmt::print("Intake Initialization complete\n\n");

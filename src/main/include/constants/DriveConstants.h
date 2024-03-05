@@ -70,6 +70,14 @@ namespace constants
             constexpr auto a = 0.0_V * 1.0_s * 1.0_s / 1.0_m;
         }
 
+        // Heading lock PID values 
+        namespace headingPID 
+        {
+            constexpr double p = 0.0;
+            constexpr double i = 0.0;
+            constexpr double d = 0.0;
+        }
+
         // Preference keys for testing
         namespace preferences
         {

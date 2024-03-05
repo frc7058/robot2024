@@ -37,9 +37,7 @@ void Robot::TeleopInit() {
   }
 }
 
-void Robot::TeleopPeriodic() {
-  m_container.TeleopPeriodic();
-}
+void Robot::TeleopPeriodic() {}
 
 void Robot::TeleopExit() {}
 

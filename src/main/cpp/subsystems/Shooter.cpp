@@ -8,13 +8,20 @@ Shooter::Shooter()
 {
     fmt::print("\nInitializing Shooter...\n");
 
+    m_feedMotor = std::make_unique<rev::CANSparkMax>(
+        ports::shooter::feedMotorCAN,
+        rev::CANSparkBase::MotorType::kBrushless);
+    m_feedMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
+
     m_leftMotor = std::make_unique<rev::CANSparkMax>(
         ports::shooter::leftMotorCAN,
         rev::CANSparkBase::MotorType::kBrushless);
+    m_leftMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
 
     m_rightMotor = std::make_unique<rev::CANSparkMax>(
         ports::shooter::rightMotorCAN,
         rev::CANSparkBase::MotorType::kBrushless);
+    m_rightMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
 
     m_leftEncoder = std::make_unique<rev::SparkRelativeEncoder>(m_leftMotor->GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor));
     m_rightEncoder = std::make_unique<rev::SparkRelativeEncoder>(m_rightMotor->GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor));
@@ -57,8 +64,15 @@ void Shooter::Periodic()
     rightOutput += feedforwardOutput;
     rightOutput = std::clamp(leftOutput, -constants::shooter::maxVoltage, constants::shooter::maxVoltage);
     
-    m_leftMotor->SetVoltage(leftOutput);
-    m_rightMotor->SetVoltage(rightOutput);
+    // m_leftMotor->SetVoltage(leftOutput);
+    // m_rightMotor->SetVoltage(rightOutput);
+}
+
+void Shooter::SetShooterVoltage(const units::volt_t voltage)
+{
+    // Might need to invert this.
+    m_leftMotor->SetVoltage(voltage);
+    m_rightMotor->SetVoltage(-voltage);
 }
 
 void Shooter::SetShooterSpeed(const units::revolutions_per_minute_t speed)
@@ -74,7 +88,7 @@ void Shooter::StopShooter()
     m_leftPID->SetSetpoint(0);
     m_rightPID->SetSetpoint(0);
 
-    m_targetSpeed = units::radians_per_second_t {0};
+    m_targetSpeed = 0.0_rad_per_s;
 
     m_leftMotor->StopMotor();
     m_rightMotor->StopMotor();

@@ -44,19 +44,22 @@ void RobotContainer::ConfigureShooterControls()
   frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kA)
     .WhileTrue(IntakeCommands::RunIntake(&m_intake));
 
-  frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kB)
-    .WhileTrue(IntakeCommands::Eject(&m_intake));
+  /*
+  // Uncomment to test just the shooter wheels
+  frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kRightBumper)
+    .OnTrue(ShooterCommands::RunShooterWheels(&m_shooter, 600_rpm))
+    .OnFalse(ShooterCommands::StopShooterWheels(&m_shooter));
+  */
 
-  // frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kRightBumper)
-  //   .OnTrue(ShooterCommands::Shoot(&m_shooter, &m_intake, 600_rpm));
+  // The RPM values here don't actually do anything right now
+  // Constant voltages are applied for testing
+
+  // Compound shoot command. Runs shooter wheels and intake at the same time
+  frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kY)
+    .OnTrue(ShooterCommands::ShootTest(&m_shooter, &m_intake));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   return pathplanner::PathPlannerAuto("name").ToPtr();
   //return frc2::cmd::Print("No autonomous command configured");
-}
-
-void RobotContainer::TeleopPeriodic()
-{
-  //m_intakeMotor.SetVoltage(6.0_V);
 }

@@ -24,31 +24,27 @@ namespace IntakeCommands
         ).ToPtr();
     }
 
-    frc2::CommandPtr FeedShooter(Intake* intake)
+    // frc2::CommandPtr FeedShooter(Intake* intake)
+    // {
+    //     return frc2::cmd::StartEnd(
+    //         // Start
+    //         [intake] { intake->RunIntake(constants::intake::feedToShooterPower); },
+
+    //         // End
+    //         [intake] { intake->StopIntake(); },
+
+    //         // Requirements
+    //         {intake}
+    //     ).WithTimeout(constants::intake::feedToShooterTime);
+    // }
+
+    frc2::CommandPtr RunFeeder(Intake* intake)
     {
-        return frc2::cmd::StartEnd(
-            // Start
-            [intake] { intake->RunIntake(constants::intake::feedToShooterPower); },
-
-            // End
-            [intake] { intake->StopIntake(); },
-
-            // Requirements
-            {intake}
-        ).WithTimeout(constants::intake::feedToShooterTime);
+        return intake->RunOnce([intake] { intake->RunIntake(constants::intake::feedToShooterPower); });
     }
 
-    frc2::CommandPtr Eject(Intake* intake)
+    frc2::CommandPtr StopFeeder(Intake* intake)
     {
-        return frc2::cmd::StartEnd(
-            // Start 
-            [intake] { intake->RunIntake(constants::intake::ejectPower); },
-
-            // End
-            [intake] { intake->StopIntake(); },
-
-            // Requirements
-            {intake}
-        );
+        return intake->RunOnce([intake] { intake->StopIntake(); });
     }
 }

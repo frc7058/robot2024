@@ -21,8 +21,6 @@ class RobotContainer {
   void TestInit();
   void TestPeriodic();
 
-  void TeleopPeriodic();
-
  private:
   void ConfigureDriveControls();
   void ConfigureShooterControls();
@@ -32,5 +30,5 @@ class RobotContainer {
 
   DriveBase m_driveBase {};
   Intake m_intake {};
-  // Shooter m_shooter {};
+  Shooter m_shooter {};
 };

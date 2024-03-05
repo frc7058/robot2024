@@ -5,6 +5,7 @@
 #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
+#include <frc/controller/PIDController.h>
 #include <array>
 
 #include "swerve/SwerveModule.h"
@@ -26,6 +27,13 @@ public:
 
     void SetTargetModuleStates(const wpi::array<frc::SwerveModuleState, 4>& moduleStates);
 
+    void TrackObject(units::radian_t heading);
+    void DisableTracking();
+
+    void LockHeading();
+    void UnlockHeading();
+    bool IsHeadingLocked() const;
+
     units::radian_t GetHeading();
     void ZeroHeading();
 
@@ -45,11 +53,16 @@ public:
 
 private:
     // Swerve kinematics helper class 
-    std::unique_ptr<frc::SwerveDriveKinematics<4>> m_kinematics;
+    std::unique_ptr<frc::SwerveDriveKinematics<4>> m_kinematics {};
 
     // Swerve odometry
     std::unique_ptr<frc::SwerveDriveOdometry<4>> m_odometry {};
 
     // NavX IMU 
     NavX m_navX;
+
+    // PID controller to lock/maintain heading
+    std::unique_ptr<frc::PIDController> m_headingPID {};
+    bool m_headingLocked = false;
+    bool m_tracking = false;
 };

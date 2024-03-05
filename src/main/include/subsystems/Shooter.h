@@ -14,6 +14,7 @@ public:
 
     void Periodic() override;
 
+    void SetShooterVoltage(const units::volt_t voltage);
     void SetShooterSpeed(const units::revolutions_per_minute_t speed);
     void StopShooter();
     units::revolutions_per_minute_t GetLeftSpeed() const;

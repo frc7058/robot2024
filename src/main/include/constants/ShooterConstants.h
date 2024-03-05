@@ -19,7 +19,10 @@ namespace constants
         constexpr units::second_t speedControlTimeout = 1.0_s;
 
         // Voltage to run the feed motor at 
-        constexpr units::volt_t feedMotorPower = 6.0_V;
+        constexpr units::volt_t feedMotorPower = 8.0_V;
+
+        // Constant voltage to shoot at (for testing)
+        constexpr units::volt_t shootPower = 12.0_V;
 
         // PID constants 
         namespace pid 
