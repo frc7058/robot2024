@@ -1,6 +1,7 @@
 #pragma once
 
 #include <units/voltage.h>
+#include <units/current.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 #include <units/time.h>
@@ -9,6 +10,8 @@ namespace constants
 {
     namespace shooter
     {
+        constexpr units::ampere_t maxCurrent = 30.0_A;
+
         // Maximum shooter voltage
         constexpr units::volt_t maxVoltage = 12.0_V;
 

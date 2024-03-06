@@ -11,17 +11,26 @@ Shooter::Shooter()
     m_feedMotor = std::make_unique<rev::CANSparkMax>(
         ports::shooter::feedMotorCAN,
         rev::CANSparkBase::MotorType::kBrushless);
-    m_feedMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
 
     m_leftMotor = std::make_unique<rev::CANSparkMax>(
         ports::shooter::leftMotorCAN,
         rev::CANSparkBase::MotorType::kBrushless);
-    m_leftMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
 
     m_rightMotor = std::make_unique<rev::CANSparkMax>(
         ports::shooter::rightMotorCAN,
         rev::CANSparkBase::MotorType::kBrushless);
+
+    m_feedMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
+    m_leftMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
     m_rightMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
+
+    m_feedMotor->SetSmartCurrentLimit(constants::shooter::maxCurrent.value());
+    m_leftMotor->SetSmartCurrentLimit(constants::shooter::maxCurrent.value());
+    m_rightMotor->SetSmartCurrentLimit(constants::shooter::maxCurrent.value());
+
+    m_feedMotor->BurnFlash();
+    m_leftMotor->BurnFlash();
+    m_rightMotor->BurnFlash();
 
     m_leftEncoder = std::make_unique<rev::SparkRelativeEncoder>(m_leftMotor->GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor));
     m_rightEncoder = std::make_unique<rev::SparkRelativeEncoder>(m_rightMotor->GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor));
