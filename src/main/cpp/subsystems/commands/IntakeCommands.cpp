@@ -38,12 +38,17 @@ namespace IntakeCommands
     //     ).WithTimeout(constants::intake::feedToShooterTime);
     // }
 
+    frc2::CommandPtr EjectIntake(Intake* intake)
+    {
+        return intake->RunOnce([intake] { intake->RunIntake(-constants::intake::intakePower); });
+    }
+
     frc2::CommandPtr RunFeeder(Intake* intake)
     {
         return intake->RunOnce([intake] { intake->RunIntake(constants::intake::feedToShooterPower); });
     }
 
-    frc2::CommandPtr StopFeeder(Intake* intake)
+    frc2::CommandPtr StopIntake(Intake* intake)
     {
         return intake->RunOnce([intake] { intake->StopIntake(); });
     }

@@ -1,8 +1,8 @@
-#include "swerve/SwerveModule.h"
+#include "lib/SwerveModule.h"
+#include "lib/Util.h"
 #include "constants/GeneralConstants.h"
 #include "constants/DriveConstants.h"
 #include "constants/PhysicalConstants.h"
-#include "lib/Util.h"
 #include <units/math.h>
 
 SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorCanID, int canCoderCanID, units::radian_t canCoderOffset)
@@ -11,10 +11,11 @@ SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorC
     fmt::print("Initializing Swerve Module {}", name);
 
     m_driveMotor = std::make_unique<rev::CANSparkMax>(driveMotorCanID, rev::CANSparkMax::MotorType::kBrushless);
-    m_driveMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast); // Remove?
+    m_driveMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
 
     m_turnMotor = std::make_unique<rev::CANSparkMax>(turnMotorCanID, rev::CANSparkMax::MotorType::kBrushless);
     m_turnMotor->SetInverted(true);
+    m_turnMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
 
     m_turnEncoder = std::make_unique<ctre::phoenix6::hardware::CANcoder>(canCoderCanID);
 

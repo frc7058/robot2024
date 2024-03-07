@@ -55,8 +55,19 @@ void RobotContainer::ConfigureShooterControls()
   // Constant voltages are applied for testing
 
   // Compound shoot command. Runs shooter wheels and intake at the same time
+  // frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kY)
+  //   .OnTrue(ShooterCommands::ShootTest(&m_shooter, &m_intake));
+
+    
+  frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kB)
+    .OnTrue(IntakeCommands::EjectIntake(&m_intake))
+    .OnFalse(IntakeCommands::StopIntake(&m_intake));
+
   frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kY)
-    .OnTrue(ShooterCommands::ShootTest(&m_shooter, &m_intake));
+    .OnTrue(ShooterCommands::RunShooterWheelsConstantVoltage(&m_shooter, 12.0_V))
+    .OnTrue(ShooterCommands::RunFeeder(&m_shooter))
+    .OnFalse(ShooterCommands::StopShooterWheels(&m_shooter))
+    .OnFalse(ShooterCommands::StopFeeder(&m_shooter));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {

@@ -11,8 +11,6 @@ class Intake : public frc2::SubsystemBase
 public:
     Intake();
 
-    //void Periodic() override;
-
     void RunIntake(units::volt_t voltage);
     void StopIntake();
     

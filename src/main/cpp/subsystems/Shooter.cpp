@@ -19,21 +19,31 @@ Shooter::Shooter()
     m_rightMotor = std::make_unique<rev::CANSparkMax>(
         ports::shooter::rightMotorCAN,
         rev::CANSparkBase::MotorType::kBrushless);
+        
+    m_feedMotor->SetInverted(true);
+    m_leftMotor->SetInverted(true);
+    m_rightMotor->SetInverted(false);
+
+    m_leftMotor->SetSmartCurrentLimit(60);
+    m_rightMotor->SetSmartCurrentLimit(60);
 
     m_feedMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
     m_leftMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
     m_rightMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
 
-    m_feedMotor->SetSmartCurrentLimit(constants::shooter::maxCurrent.value());
-    m_leftMotor->SetSmartCurrentLimit(constants::shooter::maxCurrent.value());
-    m_rightMotor->SetSmartCurrentLimit(constants::shooter::maxCurrent.value());
+    // m_feedMotor->SetSmartCurrentLimit(constants::shooter::maxCurrent.value());
+    // m_leftMotor->SetSmartCurrentLimit(constants::shooter::maxCurrent.value());
+    // m_rightMotor->SetSmartCurrentLimit(constants::shooter::maxCurrent.value());
 
-    m_feedMotor->BurnFlash();
-    m_leftMotor->BurnFlash();
-    m_rightMotor->BurnFlash();
+    // m_feedMotor->BurnFlash();
+    // m_leftMotor->BurnFlash();
+    // m_rightMotor->BurnFlash();
 
     m_leftEncoder = std::make_unique<rev::SparkRelativeEncoder>(m_leftMotor->GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor));
     m_rightEncoder = std::make_unique<rev::SparkRelativeEncoder>(m_rightMotor->GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor));
+
+    m_leftEncoder->SetVelocityConversionFactor(1.0 / 4.0);
+    m_rightEncoder->SetVelocityConversionFactor(1.0 / 4.0);
 
     m_leftPID = std::make_unique<frc::PIDController>(
         constants::shooter::pid::p,
@@ -73,6 +83,8 @@ void Shooter::Periodic()
     rightOutput += feedforwardOutput;
     rightOutput = std::clamp(leftOutput, -constants::shooter::maxVoltage, constants::shooter::maxVoltage);
     
+    fmt::print("Left: {}          Right: {}\n", m_leftEncoder->GetVelocity(), m_rightEncoder->GetVelocity());
+
     // m_leftMotor->SetVoltage(leftOutput);
     // m_rightMotor->SetVoltage(rightOutput);
 }
@@ -81,7 +93,7 @@ void Shooter::SetShooterVoltage(const units::volt_t voltage)
 {
     // Might need to invert this.
     m_leftMotor->SetVoltage(voltage);
-    m_rightMotor->SetVoltage(-voltage);
+    m_rightMotor->SetVoltage(voltage);
 }
 
 void Shooter::SetShooterSpeed(const units::revolutions_per_minute_t speed)

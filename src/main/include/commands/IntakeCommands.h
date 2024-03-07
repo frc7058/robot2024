@@ -11,6 +11,8 @@ namespace IntakeCommands
     // Feeds note from intake into the shooter
     // frc2::CommandPtr FeedShooter(Intake* intake);
 
+    frc2::CommandPtr EjectIntake(Intake* intake);
+
     frc2::CommandPtr RunFeeder(Intake* intake);
-    frc2::CommandPtr StopFeeder(Intake* intake);
+    frc2::CommandPtr StopIntake(Intake* intake);
 }

@@ -57,7 +57,7 @@ namespace ShooterCommands
                     .AlongWith(ShooterCommands::RunFeeder(shooter))
             )
             .AndThen(frc2::cmd::Wait(0.4_s))
-            .AndThen(IntakeCommands::StopFeeder(intake))
+            .AndThen(IntakeCommands::StopIntake(intake))
             .AndThen(ShooterCommands::StopFeeder(shooter))
             .AndThen(ShooterCommands::StopShooterWheels(shooter));
     }

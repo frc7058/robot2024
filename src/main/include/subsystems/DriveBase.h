@@ -8,7 +8,7 @@
 #include <frc/controller/PIDController.h>
 #include <array>
 
-#include "swerve/SwerveModule.h"
+#include "lib/SwerveModule.h"
 #include "lib/NavX.h"
 
 class DriveBase : public frc2::SubsystemBase 
