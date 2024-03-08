@@ -1,6 +1,7 @@
 #include "lib/Vision.h"
 
 #include <frc/apriltag/AprilTagFields.h>
+#include "constants/GeneralConstants.h"
 
 Vision::Vision()
 {
@@ -38,17 +39,23 @@ std::optional<photon::EstimatedRobotPose> Vision::GetEstimatedPose(photon::Photo
 
     if(estimatedPose.has_value())
     {
-        // Check if within field here
+        // Check if within field
+        units::meter_t x = estimatedPose->estimatedPose.X();
+        units::meter_t y = estimatedPose->estimatedPose.Y();
 
-        size_t numTargets = estimatedPose->targetsUsed.size();
+        if(x >= 0_m && x <= constants::field::lengthX &&
+           y >= 0_m && y <= constants::field::lengthY)
+        {
+            size_t numTargets = estimatedPose->targetsUsed.size();
 
-        // Use pose estimation if more than one target was used
-        if(numTargets > 1)
-            return estimatedPose;
+            // Use pose estimation if more than one target was used
+            if(numTargets > 1)
+                return estimatedPose;
 
-        // Use pose estimation if one target was used and is below ambiguity threshold
-        if(numTargets == 1 && estimatedPose->targetsUsed[0].GetPoseAmbiguity() <= constants::vision::maxAmbiguity)
-            return estimatedPose;
+            // Use pose estimation if one target was used and is below ambiguity threshold
+            if(numTargets == 1 && estimatedPose->targetsUsed[0].GetPoseAmbiguity() <= constants::vision::maxAmbiguity)
+                return estimatedPose;
+        }
     }
 
     return std::nullopt;
@@ -62,4 +69,17 @@ std::vector<std::optional<photon::EstimatedRobotPose>> Vision::GetEstimatedPoses
     poses.push_back(GetEstimatedPose(*m_backEstimator, prevPose));
 
     return poses;
+}
+
+std::optional<units::radian_t> Vision::GetTargetAngle()
+{
+    photon::PhotonPipelineResult result = m_objectDetectionCamera.GetLatestResult();
+
+    if(result.HasTargets())
+    {
+        units::degree_t angle {result.GetBestTarget().GetYaw()};
+        return units::convert<units::degrees, units::radians>(angle);
+    }
+
+    return std::nullopt;
 }

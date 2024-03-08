@@ -1,8 +1,9 @@
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
+#include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
-#include <frc/kinematics/SwerveDriveOdometry.h>
+// #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/controller/PIDController.h>
@@ -10,11 +11,12 @@
 
 #include "lib/SwerveModule.h"
 #include "lib/NavX.h"
+#include "lib/Vision.h"
 
 class DriveBase : public frc2::SubsystemBase 
 {
 public:
-    DriveBase();
+    DriveBase(NavX& navX, Vision& vision);
 
     void Periodic() override;
 
@@ -26,6 +28,8 @@ public:
     void Drive(frc::ChassisSpeeds chassisSpeeds);
 
     void SetTargetModuleStates(const wpi::array<frc::SwerveModuleState, 4>& moduleStates);
+
+    void VisionUpdate();
 
     void TrackObject(units::radian_t heading);
     void DisableTracking();
@@ -56,11 +60,14 @@ private:
     std::unique_ptr<frc::SwerveDriveKinematics<4>> m_kinematics {};
 
     // Swerve odometry
-    // Switch to SwerveDrivePoseEstimator
-    std::unique_ptr<frc::SwerveDriveOdometry<4>> m_odometry {};
+    std::unique_ptr<frc::SwerveDrivePoseEstimator<4>> m_poseEstimator {};
+    // std::unique_ptr<frc::SwerveDriveOdometry<4>> m_odometry {};
 
     // NavX IMU 
-    NavX m_navX;
+    NavX& m_navX;
+
+    // Vision class for AprilTag pose estimation
+    Vision& m_vision;
 
     // PID controller to lock/maintain heading
     std::unique_ptr<frc::PIDController> m_headingPID {};

@@ -6,14 +6,14 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
 
-//#include "Constants.h"
 #include "constants/Ports.h"
 #include "constants/DriveConstants.h"
 #include "constants/PhysicalConstants.h"
 #include "constants/AutoConstants.h"
 #include "constants/GeneralConstants.h"
 
-DriveBase::DriveBase()
+DriveBase::DriveBase(NavX& navX, Vision& vision)
+    : m_navX(navX), m_vision(vision)
 {
     frc::SmartDashboard::PutBoolean("Cosine scaling", true);
     frc::SmartDashboard::PutNumber("Cosine scaling exponent", constants::drive::cosineScalingExponent);
@@ -65,7 +65,14 @@ DriveBase::DriveBase()
         frc::Translation2d(-constants::physical::moduleDistanceX,  constants::physical::moduleDistanceY),
         frc::Translation2d(-constants::physical::moduleDistanceX, -constants::physical::moduleDistanceY));
 
-    m_odometry = std::make_unique<frc::SwerveDriveOdometry<4>>(*m_kinematics, GetHeading(), GetSwerveModulePositions());
+    m_poseEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<4>>(
+        *m_kinematics, 
+        GetHeading(), 
+        GetSwerveModulePositions(), 
+        frc::Pose2d(
+            frc::Translation2d(0.0_m, 0.0_m),
+            frc::Rotation2d(0.0_rad)
+        ));
 
     // m_headingPID = std::make_unique<frc::PIDController>(50, 0, 0);
     // m_headingPID->SetTolerance(0.01745);
@@ -114,8 +121,10 @@ void DriveBase::Periodic()
 
     if(m_navX.IsAvailable())
     {
-        m_odometry->Update(m_navX.Get().GetRotation2d(), GetSwerveModulePositions());
+        m_poseEstimator->Update(m_navX.Get().GetRotation2d(), GetSwerveModulePositions());
     }
+
+    VisionUpdate();
 }
 
 void DriveBase::Drive(units::meters_per_second_t velocityX, units::meters_per_second_t velocityY, units::radians_per_second_t angularVelocity, bool fieldRelative)
@@ -233,6 +242,21 @@ void DriveBase::SetTargetModuleStates(const wpi::array<frc::SwerveModuleState, 4
     }
 }
 
+void DriveBase::VisionUpdate()
+{
+    frc::Pose3d currentPose(GetPose());
+    std::vector<std::optional<photon::EstimatedRobotPose>> estimatedPoses = m_vision.GetEstimatedPoses(currentPose);
+
+    for(std::optional<photon::EstimatedRobotPose>& estimatedPose : estimatedPoses)
+    {
+        if(estimatedPose.has_value())
+        {
+            frc::Pose2d estimatedPose2d = estimatedPose->estimatedPose.ToPose2d();
+            m_poseEstimator->AddVisionMeasurement(estimatedPose2d, estimatedPose->timestamp);
+        }
+    }
+}
+
 /*
 void DriveBase::TrackObject(units::radian_t heading)
 {
@@ -291,12 +315,12 @@ void DriveBase::ZeroHeading()
 
 frc::Pose2d DriveBase::GetPose() const
 {
-    return m_odometry->GetPose();
+    return m_poseEstimator->GetEstimatedPosition();
 }
 
 void DriveBase::ResetPose(frc::Pose2d pose)
 {
-    m_odometry->ResetPosition(GetHeading(), GetSwerveModulePositions(), pose);
+    m_poseEstimator->ResetPosition(GetHeading(), GetSwerveModulePositions(), pose);
 }
 
 frc::ChassisSpeeds DriveBase::GetChassisSpeeds() const

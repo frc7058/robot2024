@@ -14,4 +14,10 @@ namespace constants
     {
         constexpr double joystickDeadband = 0.08;
     }
+
+    namespace field 
+    {
+        constexpr units::meter_t lengthX = 100.0_m;
+        constexpr units::meter_t lengthY = 100.0_m;
+    }
 }
