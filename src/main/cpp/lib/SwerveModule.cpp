@@ -44,7 +44,7 @@ SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorC
            constants::drive::turnPID::maxAcceleration
         });
     m_turnPID->SetGoal(0_rad);
-    m_turnPID->EnableContinuousInput(-constants::pi_radians, constants::pi_radians);
+    m_turnPID->EnableContinuousInput(-constants::piRadians, constants::piRadians);
     //m_turnPID->SetTolerance(constants::drive::turnPID::tolerance);
     m_turnPID_F = constants::drive::turnPID::f;
 

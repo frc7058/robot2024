@@ -56,6 +56,7 @@ private:
     std::unique_ptr<frc::SwerveDriveKinematics<4>> m_kinematics {};
 
     // Swerve odometry
+    // Switch to SwerveDrivePoseEstimator
     std::unique_ptr<frc::SwerveDriveOdometry<4>> m_odometry {};
 
     // NavX IMU 

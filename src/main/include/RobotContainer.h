@@ -10,6 +10,7 @@
 #include "subsystems/DriveBase.h"
 #include "subsystems/Intake.h"
 #include "subsystems/Shooter.h"
+#include "lib/Vision.h"
 #include "constants/Ports.h"
 
 class RobotContainer {
