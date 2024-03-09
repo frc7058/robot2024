@@ -54,7 +54,7 @@ void RobotContainer::ConfigureShooterControls()
     .OnTrue(ShooterCommands::RunShooterWheels(&m_shooter, 600_rpm))
     .OnFalse(ShooterCommands::StopShooterWheels(&m_shooter));
   */
- 
+
   // Compound shoot command. Runs shooter wheels and intake at the same time
   // frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kY)
   //   .OnTrue(ShooterCommands::ShootTest(&m_shooter, &m_intake));
@@ -80,5 +80,4 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
 
 void RobotContainer::InitSysId()
 {
-  //frc::SmartDashboard::PutData("Shooter SysId", m_shooter.GetSysIdRoutine());
 }
