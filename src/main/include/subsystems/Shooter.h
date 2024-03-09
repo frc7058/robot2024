@@ -1,6 +1,7 @@
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
+#include <frc2/command/sysid/SysIdRoutine.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <rev/CANSparkMax.h>
@@ -24,6 +25,8 @@ public:
     void StopFeeder();
 
     bool AtSpeed() const;
+
+    frc2::sysid::SysIdRoutine GetSysIdRoutine();
 
 private:
     std::unique_ptr<rev::CANSparkMax> m_feedMotor;

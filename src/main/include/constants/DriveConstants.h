@@ -19,7 +19,7 @@ namespace constants
         constexpr units::radians_per_second_t maxAngularVelocity {1.5 * std::numbers::pi};
 
         constexpr double driveMeasurementFudgeFactor = 0.975; // To match expected real-world measurements
-        constexpr double angularVelocityFudgeFactor = 1.0; // To account for lateral drift
+        constexpr double angularVelocityFudgeFactor = 6.0; // To account for lateral drift
 
         // Drive encoder measurement values
         constexpr uint32_t driveEncoderDepth = 8;
@@ -51,7 +51,7 @@ namespace constants
             // Maximum angular acceleration (rad/s^2)
             constexpr units::radians_per_second_squared_t maxAcceleration {10 * std::numbers::pi}; 
 
-            // constexpr units::radian_t tolerance = 0.002_rad; // ~0.1 degrees
+            constexpr units::radian_t tolerance = 0.1_deg;
         }
 
         // Drive motor PID values

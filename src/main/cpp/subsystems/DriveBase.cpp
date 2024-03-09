@@ -74,9 +74,10 @@ DriveBase::DriveBase(NavX& navX, Vision& vision)
             frc::Rotation2d(0.0_rad)
         ));
 
-    // m_headingPID = std::make_unique<frc::PIDController>(50, 0, 0);
-    // m_headingPID->SetTolerance(0.01745);
-    // m_headingPID->EnableContinuousInput(-constants::pi, constants::pi);
+    units::radian_t headingTolerance = 0.25_deg;
+    m_headingPID = std::make_unique<frc::PIDController>(3.0, 0, 0);
+    m_headingPID->SetTolerance(headingTolerance.value());
+    m_headingPID->EnableContinuousInput(-constants::pi, constants::pi);
 
     InitializePreferences();
 
@@ -124,7 +125,7 @@ void DriveBase::Periodic()
         m_poseEstimator->Update(m_navX.Get().GetRotation2d(), GetSwerveModulePositions());
     }
 
-    VisionUpdate();
+    // VisionUpdate();
 }
 
 void DriveBase::Drive(units::meters_per_second_t velocityX, units::meters_per_second_t velocityY, units::radians_per_second_t angularVelocity, bool fieldRelative)
@@ -146,42 +147,31 @@ void DriveBase::Drive(units::meters_per_second_t velocityX, units::meters_per_se
 
 void DriveBase::Drive(frc::ChassisSpeeds chassisSpeeds)
 {
-    // Lock heading if not commanded to rotate
-    // if(chassisSpeeds.omega == 0.0_rad_per_s)
+    // If tracking an object, rotate towards
+    // if(m_tracking)
     // {
-    //     if(!IsHeadingLocked())
-    //     {
-    //         std::cout << "Lock heading\n";
-    //         LockHeading();
-    //     }
-    // }
-    // else 
-    // {
-    //     std::cout << "Unlock heading\n";
-    //     UnlockHeading();
-    // }
+    //     double heading = GetHeading().value();
 
-    // If heading is locked or currently tracking an object, rotate towards
-    // if(m_headingLocked || m_tracking)
-    // {
-    //     units::radians_per_second_t outputAngularVelocity { -m_headingPID->Calculate(GetHeading()) };
+    //     units::radians_per_second_t outputAngularVelocity { -m_headingPID->Calculate(heading) };
+
     //     if(m_headingPID->AtSetpoint())
     //     {
-    //         std::cout << "At setpoint\n";
+    //         // std::cout << "At setpoint\n";
     //         chassisSpeeds.omega = 0.0_rad_per_s;
     //     }
     //     else 
     //     {
-    //         chassisSpeeds.omega = outputAngularVelocity;
-    //          units::degree_t degreeError = units::radian_t {m_headingPID->GetPositionError()};         
-    //         fmt::print("Error: {} ({}), output: {}", m_headingPID->GetPositionError(), degreeError, outputAngularVelocity);
+    //         chassisSpeeds.omega = std::min(outputAngularVelocity, constants::drive::maxAngularVelocity);
+
+    //         // units::degree_t degreeError = units::radian_t {m_headingPID->GetPositionError()};         
+    //         // fmt::print("Error: {} ({}), output: {}", m_headingPID->GetPositionError(), degreeError, outputAngularVelocity);
     //     }
     // } 
 
-    //units::radians_per_second_t angularVelocity = chassisSpeeds.omega;
-    //chassisSpeeds.omega *= constants::drive::angularVelocityFudgeFactor;
+    units::radians_per_second_t angularVelocity = chassisSpeeds.omega;
+    chassisSpeeds.omega *= constants::drive::angularVelocityFudgeFactor;
     chassisSpeeds = frc::ChassisSpeeds::Discretize(chassisSpeeds, 0.02_s);
-    //chassisSpeeds.omega = angularVelocity;
+    chassisSpeeds.omega = angularVelocity;
 
     wpi::array<frc::SwerveModuleState, 4> swerveModuleStates = m_kinematics->ToSwerveModuleStates(chassisSpeeds);
     m_kinematics->DesaturateWheelSpeeds(&swerveModuleStates, constants::drive::maxDriveVelocity);
@@ -244,20 +234,19 @@ void DriveBase::SetTargetModuleStates(const wpi::array<frc::SwerveModuleState, 4
 
 void DriveBase::VisionUpdate()
 {
-    frc::Pose3d currentPose(GetPose());
-    std::vector<std::optional<photon::EstimatedRobotPose>> estimatedPoses = m_vision.GetEstimatedPoses(currentPose);
+    // frc::Pose3d currentPose(GetPose());
+    // std::vector<std::optional<photon::EstimatedRobotPose>> estimatedPoses = m_vision.GetEstimatedPoses(currentPose);
 
-    for(std::optional<photon::EstimatedRobotPose>& estimatedPose : estimatedPoses)
-    {
-        if(estimatedPose.has_value())
-        {
-            frc::Pose2d estimatedPose2d = estimatedPose->estimatedPose.ToPose2d();
-            m_poseEstimator->AddVisionMeasurement(estimatedPose2d, estimatedPose->timestamp);
-        }
-    }
+    // for(std::optional<photon::EstimatedRobotPose>& estimatedPose : estimatedPoses)
+    // {
+    //     if(estimatedPose.has_value())
+    //     {
+    //         frc::Pose2d estimatedPose2d = estimatedPose->estimatedPose.ToPose2d();
+    //         m_poseEstimator->AddVisionMeasurement(estimatedPose2d, estimatedPose->timestamp);
+    //     }
+    // }
 }
 
-/*
 void DriveBase::TrackObject(units::radian_t heading)
 {
     heading = frc::AngleModulus(heading);
@@ -269,32 +258,6 @@ void DriveBase::DisableTracking()
 {
     m_tracking = false;
 }
-*/
-
-// void DriveBase::LockHeading()
-// {
-//     // Tracking takes precedence over locking
-//     m_tracking = false;
-//     if(m_tracking)
-//     {
-//         m_headingLocked = false;
-//         return;
-//     }
-
-//     units::radian_t currentHeading = frc::AngleModulus(GetHeading());
-//     m_headingPID->SetSetpoint(currentHeading.value());
-//     m_headingLocked = true;
-// }
-
-// void DriveBase::UnlockHeading()
-// {
-//     m_headingLocked = false;
-// }
-
-// bool DriveBase::IsHeadingLocked() const
-// {
-//     return m_headingLocked;
-// }
 
 units::radian_t DriveBase::GetHeading()
 {

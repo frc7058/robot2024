@@ -7,6 +7,7 @@
 #include <frc2/command/Commands.h>
 #include <frc2/command/FunctionalCommand.h>
 #include <frc2/command/button/JoystickButton.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <pathplanner/lib/commands/PathPlannerAuto.h>
 
 #include "constants/GeneralConstants.h"
@@ -36,6 +37,9 @@ void RobotContainer::ConfigureDriveControls()
     },
     {&m_driveBase}
   ));
+
+  frc2::JoystickButton(&m_driveController, frc::XboxController::Button::kX)
+    .OnTrue(frc2::cmd::RunOnce([this] { m_driveBase.ZeroHeading(); }, {}));
 }
 
 void RobotContainer::ConfigureShooterControls()
@@ -50,10 +54,7 @@ void RobotContainer::ConfigureShooterControls()
     .OnTrue(ShooterCommands::RunShooterWheels(&m_shooter, 600_rpm))
     .OnFalse(ShooterCommands::StopShooterWheels(&m_shooter));
   */
-
-  // The RPM values here don't actually do anything right now
-  // Constant voltages are applied for testing
-
+ 
   // Compound shoot command. Runs shooter wheels and intake at the same time
   // frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kY)
   //   .OnTrue(ShooterCommands::ShootTest(&m_shooter, &m_intake));
@@ -65,12 +66,19 @@ void RobotContainer::ConfigureShooterControls()
 
   frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kY)
     .OnTrue(ShooterCommands::RunShooterWheelsConstantVoltage(&m_shooter, 12.0_V))
+    .OnFalse(ShooterCommands::StopShooterWheels(&m_shooter));
+
+  frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kX)
     .OnTrue(ShooterCommands::RunFeeder(&m_shooter))
-    .OnFalse(ShooterCommands::StopShooterWheels(&m_shooter))
     .OnFalse(ShooterCommands::StopFeeder(&m_shooter));
+
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  return pathplanner::PathPlannerAuto("name").ToPtr();
-  //return frc2::cmd::Print("No autonomous command configured");
+  return pathplanner::PathPlannerAuto("rotate").ToPtr();
+}
+
+void RobotContainer::InitSysId()
+{
+  //frc::SmartDashboard::PutData("Shooter SysId", m_shooter.GetSysIdRoutine());
 }

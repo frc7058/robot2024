@@ -8,8 +8,6 @@ namespace constants
 {
     namespace intake 
     {
-        constexpr units::ampere_t maxCurrent = 30.0_A;
-
         constexpr units::volt_t intakePower = 8.0_V;
         constexpr units::volt_t feedToShooterPower = 4.0_V;
 

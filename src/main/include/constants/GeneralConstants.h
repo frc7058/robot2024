@@ -10,6 +10,8 @@ namespace constants
     constexpr double pi = 3.14159265358979323846;
     constexpr units::radian_t piRadians { pi };
 
+    constexpr bool enableSysId = true;
+
     namespace controls 
     {
         constexpr double joystickDeadband = 0.08;
@@ -21,6 +23,4 @@ namespace constants
         constexpr units::meter_t lengthX = 16.54175_m;
         constexpr units::meter_t lengthY = 8.21055_m;
     }
-
-    constexpr bool enableSysID = true;
 }

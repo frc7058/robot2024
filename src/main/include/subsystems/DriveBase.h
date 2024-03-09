@@ -1,6 +1,7 @@
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
+#include <frc2/command/sysid/SysIdRoutine.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 // #include <frc/kinematics/SwerveDriveOdometry.h>
@@ -34,9 +35,9 @@ public:
     void TrackObject(units::radian_t heading);
     void DisableTracking();
 
-    void LockHeading();
-    void UnlockHeading();
-    bool IsHeadingLocked() const;
+    // void LockHeading();
+    // void UnlockHeading();
+    // bool IsHeadingLocked() const;
 
     units::radian_t GetHeading();
     void ZeroHeading();
@@ -52,10 +53,12 @@ public:
     void InitializePreferences();
     void LoadPreferences();
 
+    // frc2::sysid::SysIdRoutine GetSysIdRoutine();
+
+private:
     // Swerve modules (ordered clockwise starting at front left module)
     std::array<std::unique_ptr<SwerveModule>, 4> m_swerveModules {};
 
-private:
     // Swerve kinematics helper class 
     std::unique_ptr<frc::SwerveDriveKinematics<4>> m_kinematics {};
 
@@ -71,6 +74,6 @@ private:
 
     // PID controller to lock/maintain heading
     std::unique_ptr<frc::PIDController> m_headingPID {};
-    bool m_headingLocked = false;
+    // bool m_headingLocked = false;
     bool m_tracking = false;
 };

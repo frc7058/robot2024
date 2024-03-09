@@ -10,8 +10,6 @@ namespace constants
 {
     namespace shooter
     {
-        constexpr units::ampere_t maxCurrent = 30.0_A;
-
         // Maximum shooter voltage
         constexpr units::volt_t maxVoltage = 12.0_V;
 
@@ -26,6 +24,9 @@ namespace constants
 
         // Constant voltage to shoot at (for testing)
         constexpr units::volt_t shootPower = 12.0_V;
+
+        // 4:1 gear reduction
+        constexpr double shooterGearReduction = 4.0;
 
         // PID constants 
         namespace pid 

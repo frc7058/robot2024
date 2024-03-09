@@ -5,9 +5,15 @@
 #include "Robot.h"
 
 #include <frc2/command/CommandScheduler.h>
+#include "constants/GeneralConstants.h"
 
 void Robot::RobotInit() 
-{}
+{
+  if(constants::enableSysId)
+  {
+    m_container.InitSysId();
+  }
+}
 
 void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();

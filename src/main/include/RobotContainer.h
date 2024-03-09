@@ -20,8 +20,7 @@ class RobotContainer {
 
   frc2::CommandPtr GetAutonomousCommand();
 
-  void TestInit();
-  void TestPeriodic();
+  void InitSysId();
 
  private:
   void ConfigureDriveControls();

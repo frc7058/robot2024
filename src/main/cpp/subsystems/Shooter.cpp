@@ -3,6 +3,7 @@
 #include "constants/Ports.h"
 
 #include <units/voltage.h>
+#include <frc/RobotController.h>
 
 Shooter::Shooter()
 {
@@ -40,10 +41,12 @@ Shooter::Shooter()
     // m_rightMotor->BurnFlash();
 
     m_leftEncoder = std::make_unique<rev::SparkRelativeEncoder>(m_leftMotor->GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor));
-    m_rightEncoder = std::make_unique<rev::SparkRelativeEncoder>(m_rightMotor->GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor));
+    m_leftEncoder->SetPositionConversionFactor(1.0 / constants::shooter::shooterGearReduction);
+    m_leftEncoder->SetVelocityConversionFactor(1.0 / constants::shooter::shooterGearReduction);
 
-    m_leftEncoder->SetVelocityConversionFactor(1.0 / 4.0);
-    m_rightEncoder->SetVelocityConversionFactor(1.0 / 4.0);
+    m_rightEncoder = std::make_unique<rev::SparkRelativeEncoder>(m_rightMotor->GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor));
+    m_rightEncoder->SetPositionConversionFactor(1.0 / constants::shooter::shooterGearReduction);
+    m_rightEncoder->SetVelocityConversionFactor(1.0 / constants::shooter::shooterGearReduction);
 
     m_leftPID = std::make_unique<frc::PIDController>(
         constants::shooter::pid::p,
@@ -138,4 +141,36 @@ void Shooter::StopFeeder()
 bool Shooter::AtSpeed() const 
 {
     return m_leftPID->AtSetpoint() && m_rightPID->AtSetpoint();
+}
+
+frc2::sysid::SysIdRoutine Shooter::GetSysIdRoutine()
+{
+    return frc2::sysid::SysIdRoutine(
+        frc2::sysid::Config(std::nullopt, std::nullopt, std::nullopt, std::nullopt),
+
+        frc2::sysid::Mechanism(
+            [this] (units::volt_t voltage)
+            {
+                m_leftMotor->SetVoltage(voltage);
+                m_rightMotor->SetVoltage(voltage);
+            },
+
+            [this] (frc::sysid::SysIdRoutineLog* log)
+            {
+                units::volt_t batteryVoltage = frc::RobotController::GetBatteryVoltage();
+
+                log->Motor("Left Motor")
+                    .voltage(m_leftMotor->Get() * batteryVoltage)
+                    .position(units::meter_t {m_leftEncoder->GetPosition()})
+                    .velocity(units::meters_per_second_t {m_leftEncoder->GetVelocity()});
+
+                log->Motor("Right Motor")
+                    .voltage(m_rightMotor->Get() * batteryVoltage)
+                    .position(units::meter_t {m_rightEncoder->GetPosition()})
+                    .velocity(units::meters_per_second_t {m_rightEncoder->GetVelocity()});
+            },
+
+            this
+        )
+    );
 }

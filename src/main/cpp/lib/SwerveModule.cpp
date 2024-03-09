@@ -45,7 +45,7 @@ SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorC
         });
     m_turnPID->SetGoal(0_rad);
     m_turnPID->EnableContinuousInput(-constants::piRadians, constants::piRadians);
-    //m_turnPID->SetTolerance(constants::drive::turnPID::tolerance);
+    m_turnPID->SetTolerance(constants::drive::turnPID::tolerance);
     m_turnPID_F = constants::drive::turnPID::f;
 
     m_driveFeedForward = std::make_unique<frc::SimpleMotorFeedforward<units::meters>>(
@@ -95,11 +95,16 @@ void SwerveModule::Periodic()
     units::radian_t angle = GetTurnAngle();
     units::volt_t turnOutput { m_turnPID->Calculate(angle) };
 
-    // if(turnOutput > 0.0_V)
-    turnOutput += units::volt_t { m_turnPID_F * util::sign(turnOutput.value()) };
-    turnOutput = std::clamp(turnOutput, -constants::drive::maxTurnVoltage, constants::drive::maxTurnVoltage);
-
-    m_turnMotor->SetVoltage(turnOutput);
+    if(m_turnPID->AtGoal())
+    {
+        m_turnMotor->StopMotor();
+    }
+    else 
+    {
+        turnOutput += units::volt_t { m_turnPID_F * util::sign(turnOutput.value()) };
+        turnOutput = std::clamp(turnOutput, -constants::drive::maxTurnVoltage, constants::drive::maxTurnVoltage);
+        m_turnMotor->SetVoltage(turnOutput);
+    }
 }   
 
 units::radian_t SwerveModule::GetTurnAngle() const
