@@ -173,7 +173,7 @@ void DriveBase::Drive(frc::ChassisSpeeds chassisSpeeds)
     //     else 
     //     {
     //         chassisSpeeds.omega = outputAngularVelocity;
-    //         units::degree_t degreeError = units::convert<units::radians, units::degrees>(m_headingPID->GetPositionError());
+    //          units::degree_t degreeError = units::radian_t {m_headingPID->GetPositionError()};         
     //         fmt::print("Error: {} ({}), output: {}", m_headingPID->GetPositionError(), degreeError, outputAngularVelocity);
     //     }
     // } 
@@ -300,7 +300,8 @@ units::radian_t DriveBase::GetHeading()
 {
     if(m_navX.IsAvailable())
     {
-        return units::convert<units::degrees, units::radians>(units::degree_t { m_navX.Get().GetYaw() });
+        units::degree_t heading {m_navX.Get().GetYaw()};
+        return units::radian_t {heading};
     }
     else 
     {

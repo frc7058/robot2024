@@ -17,7 +17,10 @@ namespace constants
 
     namespace field 
     {
-        constexpr units::meter_t lengthX = 100.0_m;
-        constexpr units::meter_t lengthY = 100.0_m;
+        // Field dimensions from page 21 of the manual (https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf)
+        constexpr units::meter_t lengthX = 16.54175_m;
+        constexpr units::meter_t lengthY = 8.21055_m;
     }
+
+    constexpr bool enableSysID = true;
 }

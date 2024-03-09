@@ -83,7 +83,7 @@ void Shooter::Periodic()
     rightOutput += feedforwardOutput;
     rightOutput = std::clamp(leftOutput, -constants::shooter::maxVoltage, constants::shooter::maxVoltage);
     
-    fmt::print("Left: {}          Right: {}\n", m_leftEncoder->GetVelocity(), m_rightEncoder->GetVelocity());
+    // fmt::print("Left: {}          Right: {}\n", m_leftEncoder->GetVelocity(), m_rightEncoder->GetVelocity());
 
     // m_leftMotor->SetVoltage(leftOutput);
     // m_rightMotor->SetVoltage(rightOutput);
@@ -101,7 +101,7 @@ void Shooter::SetShooterSpeed(const units::revolutions_per_minute_t speed)
     m_leftPID->SetSetpoint(speed.value());
     m_rightPID->SetSetpoint(speed.value());
 
-    m_targetSpeed = units::convert<units::revolutions_per_minute, units::radians_per_second>(speed);
+    m_targetSpeed = speed;
 }
 
 void Shooter::StopShooter()

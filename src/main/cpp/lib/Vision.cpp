@@ -43,8 +43,8 @@ std::optional<photon::EstimatedRobotPose> Vision::GetEstimatedPose(photon::Photo
         units::meter_t x = estimatedPose->estimatedPose.X();
         units::meter_t y = estimatedPose->estimatedPose.Y();
 
-        if(x >= 0_m && x <= constants::field::lengthX &&
-           y >= 0_m && y <= constants::field::lengthY)
+        if(x > 0_m && x < constants::field::lengthX &&
+           y > 0_m && y < constants::field::lengthY)
         {
             size_t numTargets = estimatedPose->targetsUsed.size();
 
@@ -78,7 +78,7 @@ std::optional<units::radian_t> Vision::GetTargetAngle()
     if(result.HasTargets())
     {
         units::degree_t angle {result.GetBestTarget().GetYaw()};
-        return units::convert<units::degrees, units::radians>(angle);
+        return units::radian_t {angle};
     }
 
     return std::nullopt;
