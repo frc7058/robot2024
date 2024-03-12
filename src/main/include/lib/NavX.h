@@ -11,6 +11,6 @@ public:
     bool IsAvailable() const;
 
 private:
-    AHRS m_navX {frc::SPI::Port::kMXP};
+    AHRS m_navX {frc::SPI::kMXP};
     bool m_isAvailable {false};
 };

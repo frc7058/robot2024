@@ -234,17 +234,19 @@ void DriveBase::SetTargetModuleStates(const wpi::array<frc::SwerveModuleState, 4
 
 void DriveBase::VisionUpdate()
 {
-    // frc::Pose3d currentPose(GetPose());
-    // std::vector<std::optional<photon::EstimatedRobotPose>> estimatedPoses = m_vision.GetEstimatedPoses(currentPose);
+    frc::Pose3d currentPose(GetPose());
+    std::vector<std::optional<VisionPoseResult>> estimatedPoses = m_vision.GetEstimatedPoses(currentPose);
 
-    // for(std::optional<photon::EstimatedRobotPose>& estimatedPose : estimatedPoses)
-    // {
-    //     if(estimatedPose.has_value())
-    //     {
-    //         frc::Pose2d estimatedPose2d = estimatedPose->estimatedPose.ToPose2d();
-    //         m_poseEstimator->AddVisionMeasurement(estimatedPose2d, estimatedPose->timestamp);
-    //     }
-    // }
+    for(std::optional<VisionPoseResult>& visionResult : estimatedPoses)
+    {
+        if(visionResult.has_value())
+        {
+            frc::Pose2d estimatedPose2d = visionResult->estimatedPose.estimatedPose.ToPose2d();
+            units::second_t timestamp = visionResult->estimatedPose.timestamp;
+            
+            m_poseEstimator->AddVisionMeasurement(estimatedPose2d, timestamp, visionResult->standardDeviations);
+        }
+    }
 }
 
 void DriveBase::TrackObject(units::radian_t heading)
