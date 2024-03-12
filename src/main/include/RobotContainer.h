@@ -30,9 +30,9 @@ class RobotContainer {
   frc::XboxController m_shooterController {1};
 
   Vision m_vision {};
-  NavX m_navX {};
+  // NavX m_navX {};
 
-  DriveBase m_driveBase {m_navX, m_vision};
+  DriveBase m_driveBase {m_vision};
   Intake m_intake {};
   Shooter m_shooter {};
 };

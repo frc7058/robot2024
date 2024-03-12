@@ -71,11 +71,12 @@ void RobotContainer::ConfigureShooterControls()
   frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kX)
     .OnTrue(ShooterCommands::RunFeeder(&m_shooter))
     .OnFalse(ShooterCommands::StopFeeder(&m_shooter));
-
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  return pathplanner::PathPlannerAuto("rotate").ToPtr();
+  return pathplanner::PathPlannerAuto("rotate").ToPtr()
+    .OnlyWhile([&] { return m_driveBase.IsNavXAvailable(); })
+    .FinallyDo([&] { m_driveBase.Stop(); });
 }
 
 void RobotContainer::InitSysId()

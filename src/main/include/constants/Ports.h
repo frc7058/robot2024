@@ -41,8 +41,19 @@ namespace ports
         constexpr int rightMotorCAN = 17;
     }
 
+    namespace climber
+    {
+        constexpr int motorOneCAN = 18;
+        constexpr int motorTwoCAN = 19;
+    }
+
     namespace dio 
     {
-        // constexpr int photoElectricSensor = 0;
+        constexpr int photoElectricSensor = 0;
+    }
+
+    namespace pwm 
+    {
+        constexpr int LEDLights = 0;
     }
 }

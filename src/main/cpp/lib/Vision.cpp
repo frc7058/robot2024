@@ -1,6 +1,7 @@
 #include "lib/Vision.h"
 
 #include <frc/apriltag/AprilTagFields.h>
+#include <wpinet/PortForwarder.h>
 #include "constants/GeneralConstants.h"
 
 Vision::Vision()
@@ -28,6 +29,8 @@ Vision::Vision()
 
     m_frontEstimator->SetMultiTagFallbackStrategy(constants::vision::backupPoseStrategy);
     m_backEstimator->SetMultiTagFallbackStrategy(constants::vision::backupPoseStrategy);
+
+    wpi::PortForwarder::GetInstance().Add(5800, "photonvision.local", 5800);
 }
 
 std::optional<VisionPoseResult> Vision::GetEstimatedPose(photon::PhotonPoseEstimator& poseEstimator, frc::Pose3d prevPose)

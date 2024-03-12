@@ -12,8 +12,8 @@
 #include "constants/AutoConstants.h"
 #include "constants/GeneralConstants.h"
 
-DriveBase::DriveBase(NavX& navX, Vision& vision)
-    : m_navX(navX), m_vision(vision)
+DriveBase::DriveBase(Vision& vision)
+    : m_vision(vision)
 {
     frc::SmartDashboard::PutBoolean("Cosine scaling", true);
     frc::SmartDashboard::PutNumber("Cosine scaling exponent", constants::drive::cosineScalingExponent);
@@ -50,14 +50,14 @@ DriveBase::DriveBase(NavX& navX, Vision& vision)
         constants::drive::encoderOffsets::backRight));
     m_swerveModules[3]->SetDriveMotorInverted(true);
 
-    if(m_navX.IsAvailable())
-    {
-        ZeroHeading();
-    }
-    else 
-    {
-        fmt::print("NavX is not available: Field-oriented drive and odometry are disabled.\n");
-    }
+    // if(m_navX.IsAvailable())
+    // {
+    //     ZeroHeading();
+    // }
+    // else 
+    // {
+    //     fmt::print("NavX is not available: Field-oriented drive and odometry are disabled.\n");
+    // }
      
     m_kinematics = std::make_unique<frc::SwerveDriveKinematics<4>>(
         frc::Translation2d( constants::physical::moduleDistanceX,  constants::physical::moduleDistanceY),
@@ -120,10 +120,7 @@ void DriveBase::Periodic()
         swerveModule->Periodic();
     }
 
-    if(m_navX.IsAvailable())
-    {
-        m_poseEstimator->Update(m_navX.Get().GetRotation2d(), GetSwerveModulePositions());
-    }
+    m_poseEstimator->Update(m_navX.GetRotation2d(), GetSwerveModulePositions());
 
     // VisionUpdate();
 }
@@ -134,9 +131,9 @@ void DriveBase::Drive(units::meters_per_second_t velocityX, units::meters_per_se
 
     frc::ChassisSpeeds chassisSpeeds { velocityX, velocityY, angularVelocity };
 
-    if(fieldRelative && m_navX.IsAvailable())
+    if(fieldRelative)
     {
-        frc::Rotation2d robotRotation = m_navX.Get().GetRotation2d();
+        frc::Rotation2d robotRotation = m_navX.GetRotation2d();
         chassisSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(velocityX, velocityY, angularVelocity, robotRotation);
     }
 
@@ -196,6 +193,11 @@ void DriveBase::Drive(frc::ChassisSpeeds chassisSpeeds)
     }
 
     SetTargetModuleStates(swerveModuleStates);
+}
+
+void DriveBase::Stop()
+{
+    Drive(frc::ChassisSpeeds {0_mps, 0_mps, 0_rad_per_s});
 }
 
 void DriveBase::SetTargetModuleStates(const wpi::array<frc::SwerveModuleState, 4>& moduleStates)
@@ -263,20 +265,23 @@ void DriveBase::DisableTracking()
 
 units::radian_t DriveBase::GetHeading()
 {
-    if(m_navX.IsAvailable())
-    {
-        units::degree_t heading {m_navX.Get().GetYaw()};
-        return units::radian_t {heading};
-    }
-    else 
-    {
-        return units::radian_t {0};
-    }
+    units::degree_t heading {m_navX.GetYaw()};
+    return units::radian_t {heading};
+
+    // if(m_navX.IsAvailable())
+    // {
+    //     units::degree_t heading {m_navX.Get().GetYaw()};
+    //     return units::radian_t {heading};
+    // }
+    // else 
+    // {
+    //     return units::radian_t {0};
+    // }
 }
 
 void DriveBase::ZeroHeading()
 {
-    m_navX.Get().ZeroYaw();
+    m_navX.ZeroYaw();
 }
 
 frc::Pose2d DriveBase::GetPose() const
@@ -312,6 +317,11 @@ wpi::array<frc::SwerveModulePosition, 4> DriveBase::GetSwerveModulePositions() c
         m_swerveModules[2]->GetPosition(),
         m_swerveModules[3]->GetPosition()
     };
+}
+
+bool DriveBase::IsNavXAvailable()
+{
+    return m_navX.IsConnected() && !m_navX.IsCalibrating();
 }
 
 void DriveBase::InitializePreferences()

@@ -18,5 +18,5 @@ public:
 
 private:
     std::unique_ptr<rev::CANSparkMax> m_intakeMotor;
-    //std::unique_ptr<frc::DigitalInput> m_photoElectricSensor; 
+    std::unique_ptr<frc::DigitalInput> m_photoElectricSensor; 
 };

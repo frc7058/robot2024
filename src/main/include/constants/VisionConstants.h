@@ -27,7 +27,7 @@ namespace constants
 
         // Max distance (for single tag)
         constexpr units::meter_t maxSingleTagDistance = 4.0_m;
-
+  
         // Default standard deviations 
         constexpr wpi::array<double, 3U> singleTagStdDevs {4.0, 4.0, 8.0};
         constexpr wpi::array<double, 3U> multiTagStdDevs {0.5, 0.5, 1.0};

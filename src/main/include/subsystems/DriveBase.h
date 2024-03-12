@@ -8,6 +8,7 @@
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/controller/PIDController.h>
+#include <AHRS.h>
 #include <array>
 
 #include "lib/SwerveModule.h"
@@ -17,7 +18,7 @@
 class DriveBase : public frc2::SubsystemBase 
 {
 public:
-    DriveBase(NavX& navX, Vision& vision);
+    DriveBase(Vision& vision);
 
     void Periodic() override;
 
@@ -27,6 +28,8 @@ public:
                bool fieldRelative);
 
     void Drive(frc::ChassisSpeeds chassisSpeeds);
+
+    void Stop();
 
     void SetTargetModuleStates(const wpi::array<frc::SwerveModuleState, 4>& moduleStates);
 
@@ -50,6 +53,8 @@ public:
     wpi::array<frc::SwerveModuleState, 4> GetSwerveModuleStates() const;
     wpi::array<frc::SwerveModulePosition, 4> GetSwerveModulePositions() const;
 
+    bool IsNavXAvailable();
+
     void InitializePreferences();
     void LoadPreferences();
 
@@ -67,13 +72,13 @@ private:
     // std::unique_ptr<frc::SwerveDriveOdometry<4>> m_odometry {};
 
     // NavX IMU 
-    NavX& m_navX;
+    // NavX& m_navX;
+    AHRS m_navX {frc::SerialPort::kUSB1};
 
     // Vision class for AprilTag pose estimation
     Vision& m_vision;
 
     // PID controller to lock/maintain heading
     std::unique_ptr<frc::PIDController> m_headingPID {};
-    // bool m_headingLocked = false;
     bool m_tracking = false;
 };
