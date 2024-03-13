@@ -109,6 +109,8 @@ DriveBase::DriveBase(Vision& vision)
 
         this
     );
+
+    frc::SmartDashboard::PutData("Field", &m_field);
     
     fmt::print("DriveBase Initialization complete\n\n");
 }
@@ -122,7 +124,12 @@ void DriveBase::Periodic()
 
     m_poseEstimator->Update(m_navX.GetRotation2d(), GetSwerveModulePositions());
 
-    // VisionUpdate();
+    VisionUpdate();
+
+    frc::SmartDashboard::PutNumber("X", GetPose().X().value());
+    frc::SmartDashboard::PutNumber("Y", GetPose().Y().value());
+
+    m_field.SetRobotPose(GetPose());
 }
 
 void DriveBase::Drive(units::meters_per_second_t velocityX, units::meters_per_second_t velocityY, units::radians_per_second_t angularVelocity, bool fieldRelative)

@@ -7,6 +7,7 @@
 // #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
+#include <frc/smartdashboard/Field2d.h>
 #include <frc/controller/PIDController.h>
 #include <AHRS.h>
 #include <array>
@@ -81,4 +82,6 @@ private:
     // PID controller to lock/maintain heading
     std::unique_ptr<frc::PIDController> m_headingPID {};
     bool m_tracking = false;
+
+    frc::Field2d m_field;
 };

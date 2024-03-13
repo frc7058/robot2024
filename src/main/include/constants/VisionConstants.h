@@ -37,9 +37,11 @@ namespace constants
 
         namespace frontCamera 
         {
+            // center, .5 inches extended out (so 14 inches)
+            // 30 degrees rotated back
             constexpr std::string_view name = "Front Arducam";
-            const frc::Translation3d relativePosition {0.0_m, 0.0_m, 0.0_m};
-            const frc::Rotation3d relativeRotation {0.0_rad, 0.0_rad, 0.0_rad};
+            const frc::Translation3d relativePosition {14.0_in, 0.0_m, 2.0_in};
+            const frc::Rotation3d relativeRotation {-45.0_deg, 0.0_rad, 0.0_rad};
         }
 
         namespace backCamera
