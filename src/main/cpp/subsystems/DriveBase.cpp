@@ -8,7 +8,6 @@
 
 #include "constants/Ports.h"
 #include "constants/DriveConstants.h"
-#include "constants/PhysicalConstants.h"
 #include "constants/AutoConstants.h"
 #include "constants/GeneralConstants.h"
 
@@ -60,10 +59,10 @@ DriveBase::DriveBase(Vision& vision)
     // }
      
     m_kinematics = std::make_unique<frc::SwerveDriveKinematics<4>>(
-        frc::Translation2d( constants::physical::moduleDistanceX,  constants::physical::moduleDistanceY),
-        frc::Translation2d( constants::physical::moduleDistanceX, -constants::physical::moduleDistanceY),
-        frc::Translation2d(-constants::physical::moduleDistanceX,  constants::physical::moduleDistanceY),
-        frc::Translation2d(-constants::physical::moduleDistanceX, -constants::physical::moduleDistanceY));
+        frc::Translation2d( constants::drive::moduleDistanceX,  constants::drive::moduleDistanceY),
+        frc::Translation2d( constants::drive::moduleDistanceX, -constants::drive::moduleDistanceY),
+        frc::Translation2d(-constants::drive::moduleDistanceX,  constants::drive::moduleDistanceY),
+        frc::Translation2d(-constants::drive::moduleDistanceX, -constants::drive::moduleDistanceY));
 
     m_poseEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<4>>(
         *m_kinematics, 
@@ -75,7 +74,11 @@ DriveBase::DriveBase(Vision& vision)
         ));
 
     units::radian_t headingTolerance = 0.25_deg;
-    m_headingPID = std::make_unique<frc::PIDController>(3.0, 0, 0);
+    m_headingPID = std::make_unique<frc::PIDController>(
+        constants::drive::headingPID::p,
+        constants::drive::headingPID::i,
+        constants::drive::headingPID::d
+    );
     m_headingPID->SetTolerance(headingTolerance.value());
     m_headingPID->EnableContinuousInput(-constants::pi, constants::pi);
 
@@ -268,6 +271,11 @@ void DriveBase::TrackObject(units::radian_t heading)
 void DriveBase::DisableTracking()
 {
     m_tracking = false;
+}
+
+bool DriveBase::IsTrackingEnabled() const
+{
+    return m_tracking;
 }
 
 units::radian_t DriveBase::GetHeading()

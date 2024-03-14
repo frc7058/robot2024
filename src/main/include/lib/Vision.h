@@ -6,6 +6,7 @@
 #include <vector>
 #include <optional>
 #include "constants/VisionConstants.h"
+#include "constants/FieldConstants.h"
 
 struct VisionPoseResult
 {
@@ -24,7 +25,7 @@ public:
     std::optional<units::radian_t> GetTargetAngle();
 
 private:
-    frc::AprilTagFieldLayout m_fieldLayout { frc::LoadAprilTagLayoutField(constants::vision::aprilTagField) };
+    frc::AprilTagFieldLayout m_fieldLayout { frc::LoadAprilTagLayoutField(constants::field::aprilTagField) };
 
     std::shared_ptr<photon::PhotonCamera> m_frontCamera;
     // std::shared_ptr<photon::PhotonCamera> m_backCamera;

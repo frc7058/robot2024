@@ -2,7 +2,6 @@
 #include "lib/Util.h"
 #include "constants/GeneralConstants.h"
 #include "constants/DriveConstants.h"
-#include "constants/PhysicalConstants.h"
 #include <units/math.h>
 
 SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorCanID, int canCoderCanID, units::radian_t canCoderOffset)
@@ -23,7 +22,7 @@ SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorC
     m_driveEncoder->SetAverageDepth(constants::drive::driveEncoderDepth);
     m_driveEncoder->SetMeasurementPeriod(constants::drive::driveEncoderPeriod);
 
-    units::meter_t positionConversionFactor = constants::physical::wheelCircumference / (constants::physical::driveGearRatio) * constants::drive::driveMeasurementFudgeFactor;
+    units::meter_t positionConversionFactor = constants::drive::wheelCircumference / (constants::drive::driveGearRatio) * constants::drive::driveMeasurementFudgeFactor;
     m_driveEncoder->SetPositionConversionFactor(positionConversionFactor.value());
     
     units::meter_t velocityConversionFactor = positionConversionFactor / 60.0;

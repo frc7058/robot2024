@@ -4,7 +4,6 @@
 #include <pathplanner/lib/util/PIDConstants.h>
 #include <pathplanner/lib/util/ReplanningConfig.h>
 #include "constants/DriveConstants.h"
-#include "constants/PhysicalConstants.h"
 
 namespace constants 
 {
@@ -21,7 +20,7 @@ namespace constants
             constants::drive::maxDriveVelocity,
 
             // Distance from robot center to swerve modules
-            constants::physical::radiusToModules,
+            constants::drive::radiusToModules,
 
             // Default path replanning config
             pathplanner::ReplanningConfig()

@@ -38,6 +38,7 @@ public:
 
     void TrackObject(units::radian_t heading);
     void DisableTracking();
+    bool IsTrackingEnabled() const;
 
     // void LockHeading();
     // void UnlockHeading();

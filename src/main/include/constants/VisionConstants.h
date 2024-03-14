@@ -1,7 +1,6 @@
 #pragma once
 
 #include <photon/PhotonPoseEstimator.h>
-#include <frc/apriltag/AprilTagFields.h>
 #include <frc/geometry/Transform3d.h>
 #include <frc/geometry/Rotation3d.h>
 #include <wpi/array.h>
@@ -13,9 +12,6 @@ namespace constants
 {
     namespace vision
     {
-        // AprilTag field layout
-        constexpr frc::AprilTagField aprilTagField = frc::AprilTagField::k2024Crescendo;
-
         // Main pose strategy
         constexpr photon::PoseStrategy poseStrategy = photon::PoseStrategy::MULTI_TAG_PNP_ON_COPROCESSOR;
 

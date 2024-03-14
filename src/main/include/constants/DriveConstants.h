@@ -18,6 +18,18 @@ namespace constants
         constexpr units::meters_per_second_t maxDriveVelocity = 2.0_mps;
         constexpr units::radians_per_second_t maxAngularVelocity {1.5 * std::numbers::pi};
 
+        // Swerve wheels inforrmation
+        constexpr units::meter_t wheelDiameter = 0.1016_m;
+        constexpr units::meter_t wheelCircumference = wheelDiameter * std::numbers::pi;
+
+        // Swerve module locations from center of mass 
+        constexpr units::meter_t moduleDistanceX = 0.27305_m; 
+        constexpr units::meter_t moduleDistanceY = 0.27305_m; 
+        constexpr units::meter_t radiusToModules = 0.38615_m; 
+
+        // Swerve drive gear ratio 
+        constexpr double driveGearRatio = 6.75;
+
         constexpr double driveMeasurementFudgeFactor = 0.975; // To match expected real-world measurements
         constexpr double angularVelocityFudgeFactor = 6.0; // To account for lateral drift
 

@@ -10,9 +10,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <pathplanner/lib/commands/PathPlannerAuto.h>
 
-#include "constants/GeneralConstants.h"
-#include "constants/DriveConstants.h"
-#include "lib/Util.h"
+#include "commands/DriveCommand.h"
 #include "commands/IntakeCommands.h"
 #include "commands/ShooterCommands.h"
 
@@ -23,20 +21,7 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureDriveControls() 
 {
-  m_driveBase.SetDefaultCommand(frc2::cmd::Run(
-    [this] {
-      double leftX = frc::ApplyDeadband(m_driveController.GetLeftX(), constants::controls::joystickDeadband);
-      double leftY = frc::ApplyDeadband(m_driveController.GetLeftY(), constants::controls::joystickDeadband);
-      double rightX = frc::ApplyDeadband(m_driveController.GetRightX(), constants::controls::joystickDeadband);
-
-      units::meters_per_second_t velocityX = util::sign(leftY) * -(leftY * leftY) * constants::drive::maxDriveVelocity;
-      units::meters_per_second_t velocityY = util::sign(leftX) * -(leftX * leftX) * constants::drive::maxDriveVelocity;
-      units::radians_per_second_t angularVelocity = util::sign(rightX) * -(rightX * rightX) * constants::drive::maxAngularVelocity;
-
-      m_driveBase.Drive(velocityX, velocityY, angularVelocity, true);
-    },
-    {&m_driveBase}
-  ));
+  m_driveBase.SetDefaultCommand(DriveCommand(&m_driveBase, m_vision, m_driveController));
 
   frc2::JoystickButton(&m_driveController, frc::XboxController::Button::kX)
     .OnTrue(frc2::cmd::RunOnce([this] { m_driveBase.ZeroHeading(); }, {}));
