@@ -19,6 +19,11 @@ Intake::Intake()
     fmt::print("Intake Initialization complete\n\n");
 }
 
+void Intake::Periodic()
+{
+    // fmt::print("Intake current: {}\n", m_intakeMotor->GetOutputCurrent());
+}
+
 void Intake::RunIntake(units::volt_t voltage)
 {
     m_intakeMotor->SetVoltage(voltage);
@@ -31,5 +36,5 @@ void Intake::StopIntake()
 
 bool Intake::IsNoteDetected() const
 {
-    return m_photoElectricSensor->Get();
+    return true; // m_photoElectricSensor->Get();
 }

@@ -56,4 +56,12 @@ namespace ports
     {
         constexpr int LEDLights = 0;
     }
+
+    namespace pdh 
+    {
+        constexpr int pdhCAN = 1;
+
+        constexpr int climbMotorOneChannel = 6;
+        constexpr int climbMotorTwoChannel = 7;
+    }
 }

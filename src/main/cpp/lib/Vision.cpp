@@ -6,14 +6,14 @@
 
 Vision::Vision()
 {
-    m_frontEstimator = std::make_unique<photon::PhotonPoseEstimator>(
-        m_fieldLayout, 
-        constants::vision::poseStrategy, 
-        photon::PhotonCamera(constants::vision::frontCamera::name),
-        frc::Transform3d(
-            constants::vision::frontCamera::relativePosition,
-            constants::vision::frontCamera::relativeRotation
-        ));
+    // m_frontEstimator = std::make_unique<photon::PhotonPoseEstimator>(
+    //     m_fieldLayout, 
+    //     constants::vision::poseStrategy, 
+    //     photon::PhotonCamera(constants::vision::frontCamera::name),
+    //     frc::Transform3d(
+    //         constants::vision::frontCamera::relativePosition,
+    //         constants::vision::frontCamera::relativeRotation
+    //     ));
 
     // m_backEstimator = std::make_unique<photon::PhotonPoseEstimator>(
     //     m_fieldLayout, 
@@ -24,10 +24,10 @@ Vision::Vision()
     //         constants::vision::backCamera::relativeRotation
     //     ));
 
-    m_frontCamera = m_frontEstimator->GetCamera();
-    // m_backCamera = m_frontEstimator->GetCamera();
+    // m_frontCamera = m_frontEstimator->GetCamera();
+    // // m_backCamera = m_frontEstimator->GetCamera();
 
-    m_frontEstimator->SetMultiTagFallbackStrategy(constants::vision::backupPoseStrategy);
+    // m_frontEstimator->SetMultiTagFallbackStrategy(constants::vision::backupPoseStrategy);
     // m_backEstimator->SetMultiTagFallbackStrategy(constants::vision::backupPoseStrategy);
 
     wpi::PortForwarder::GetInstance().Add(5800, "photonvision.local", 5800);
@@ -111,7 +111,7 @@ std::vector<std::optional<VisionPoseResult>> Vision::GetEstimatedPoses(frc::Pose
 {
     std::vector<std::optional<VisionPoseResult>> poses;
 
-    poses.push_back(GetEstimatedPose(*m_frontEstimator, prevPose));
+    // poses.push_back(GetEstimatedPose(*m_frontEstimator, prevPose));
     // poses.push_back(GetEstimatedPose(*m_backEstimator, prevPose));
 
     return poses;

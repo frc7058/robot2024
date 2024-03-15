@@ -13,6 +13,11 @@
 #include "commands/DriveCommand.h"
 #include "commands/IntakeCommands.h"
 #include "commands/ShooterCommands.h"
+#include "commands/ClimberCommands.h"
+
+#include "constants/GeneralConstants.h"
+#include "constants/DriveConstants.h"
+#include "lib/Util.h"
 
 RobotContainer::RobotContainer() {
   ConfigureDriveControls();
@@ -21,7 +26,20 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureDriveControls() 
 {
-  m_driveBase.SetDefaultCommand(DriveCommand(&m_driveBase, m_vision, m_driveController));
+  m_driveBase.SetDefaultCommand(frc2::cmd::Run(
+    [this] {
+      double leftX = frc::ApplyDeadband(m_driveController.GetLeftX(), constants::controls::joystickDeadband);
+      double leftY = frc::ApplyDeadband(m_driveController.GetLeftY(), constants::controls::joystickDeadband);
+      double rightX = frc::ApplyDeadband(m_driveController.GetRightX(), constants::controls::joystickDeadband);
+
+      units::meters_per_second_t velocityX = util::sign(leftY) * -(leftY * leftY) * constants::drive::maxDriveVelocity;
+      units::meters_per_second_t velocityY = util::sign(leftX) * -(leftX * leftX) * constants::drive::maxDriveVelocity;
+      units::radians_per_second_t angularVelocity = util::sign(rightX) * -(rightX * rightX) * constants::drive::maxAngularVelocity;
+
+      m_driveBase.Drive(velocityX, velocityY, angularVelocity, true);
+    },
+    {&m_driveBase}
+  ));
 
   frc2::JoystickButton(&m_driveController, frc::XboxController::Button::kX)
     .OnTrue(frc2::cmd::RunOnce([this] { m_driveBase.ZeroHeading(); }, {}));
@@ -49,13 +67,27 @@ void RobotContainer::ConfigureShooterControls()
     .OnTrue(IntakeCommands::EjectIntake(&m_intake))
     .OnFalse(IntakeCommands::StopIntake(&m_intake));
 
-  frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kY)
-    .OnTrue(ShooterCommands::RunShooterWheelsConstantVoltage(&m_shooter, 12.0_V))
-    .OnFalse(ShooterCommands::StopShooterWheels(&m_shooter));
+  // frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kY)
+  //   .OnTrue(ShooterCommands::RunShooterWheelsConstantVoltage(&m_shooter, 12.0_V))
+  //   .OnFalse(ShooterCommands::StopShooterWheels(&m_shooter));
 
-  frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kX)
-    .OnTrue(ShooterCommands::RunFeeder(&m_shooter))
-    .OnFalse(ShooterCommands::StopFeeder(&m_shooter));
+  // frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kY)
+  //   .OnTrue(ShooterCommands::ShootTest(&m_shooter, &m_intake));
+
+  // frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kX)
+  //   .OnTrue(ShooterCommands::RunFeeder(&m_shooter))
+  //   .OnFalse(ShooterCommands::StopFeeder(&m_shooter));
+
+  frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kLeftBumper)
+    .OnTrue(ClimberCommands::RaiseHook(&m_climber))
+    .OnFalse(ClimberCommands::StopClimber(&m_climber));
+
+  frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kRightBumper)
+    .OnTrue(ClimberCommands::LowerHook(&m_climber))
+    .OnFalse(ClimberCommands::StopClimber(&m_climber));
+
+  //frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kB)
+  //  .OnTrue(frc2::cmd::RunOnce([this] {m_climber.Unlock(); }, {}));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {

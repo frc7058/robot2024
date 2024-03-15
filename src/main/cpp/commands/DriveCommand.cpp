@@ -18,8 +18,6 @@ frc2::CommandPtr DriveCommand(DriveBase* driveBase, Vision& vision, frc::XboxCon
             units::meters_per_second_t velocityY = util::sign(leftX) * -(leftX * leftX) * constants::drive::maxDriveVelocity;
             units::radians_per_second_t angularVelocity = util::sign(rightX) * -(rightX * rightX) * constants::drive::maxAngularVelocity;
 
-            bool targetLock = false;
-
             std::optional<frc::DriverStation::Alliance> alliance = frc::DriverStation::GetAlliance();
 
             if(driveController.GetLeftBumper())
@@ -35,7 +33,6 @@ frc2::CommandPtr DriveCommand(DriveBase* driveBase, Vision& vision, frc::XboxCon
                 else 
                 {
                     fmt::print("No target found\n");
-                    driveBase->DisableTracking();
                 }
             }
             else if(driveController.GetRightBumper() && alliance.has_value())
@@ -49,8 +46,8 @@ frc2::CommandPtr DriveCommand(DriveBase* driveBase, Vision& vision, frc::XboxCon
 
                 frc::Translation2d targetPosition = currentPosition.Nearest({ speakerPosition, ampPosition });
                 units::radian_t angleToTarget = units::math::atan2(
-                targetPosition.Y() - currentPosition.Y(),
-                targetPosition.X() - currentPosition.X());
+                    targetPosition.Y() - currentPosition.Y(),
+                    targetPosition.X() - currentPosition.X());
 
                 // m_driveBase.TrackObject(angleToTarget);
             }
@@ -59,7 +56,7 @@ frc2::CommandPtr DriveCommand(DriveBase* driveBase, Vision& vision, frc::XboxCon
                 driveBase->DisableTracking();
             }
 
-            driveBase->Drive(velocityX, velocityY, angularVelocity, true);
+            driveBase->Drive(velocityX, velocityY, angularVelocity, !driveBase->IsTrackingEnabled());
         },
 
         {driveBase}
