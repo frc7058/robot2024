@@ -11,18 +11,21 @@ namespace constants
     namespace drive 
     {
         // Motor voltage limits
-        constexpr units::volt_t maxDriveVoltage = 8.0_V;
-        constexpr units::volt_t maxTurnVoltage = 8.0_V;
+        constexpr units::volt_t maxDriveVoltage = 11.5_V;
+        constexpr units::volt_t maxTurnVoltage = 9.0_V;
         
         // Maximum drive velocities
-        constexpr units::meters_per_second_t maxDriveVelocity = 2.0_mps;
+        constexpr units::meters_per_second_t maxDriveVelocity = 4.25_mps;
         constexpr units::radians_per_second_t maxAngularVelocity {1.5 * std::numbers::pi};
+
+        constexpr units::meters_per_second_t slowMaxDriveVelocity = 1.5_mps;
+        constexpr units::radians_per_second_t slowMaxAngularVelocity {1.0 * std::numbers::pi};
 
         // Swerve wheels inforrmation
         constexpr units::meter_t wheelDiameter = 0.1016_m;
         constexpr units::meter_t wheelCircumference = wheelDiameter * std::numbers::pi;
 
-        // Swerve module locations from center of mass 
+        // Swerve module locations from robot center
         constexpr units::meter_t moduleDistanceX = 0.27305_m; 
         constexpr units::meter_t moduleDistanceY = 0.27305_m; 
         constexpr units::meter_t radiusToModules = 0.38615_m; 
@@ -43,19 +46,19 @@ namespace constants
 
         namespace encoderOffsets 
         {
-            constexpr units::radian_t frontLeft = 1.2471263805510262_rad;
-            constexpr units::radian_t frontRight = -0.6258641614573416_rad;
-            constexpr units::radian_t backLeft = -1.8837284075235674_rad;
-            constexpr units::radian_t backRight = 2.885417862012891_rad;
+            constexpr units::radian_t frontLeft = 1.24712638055_rad;
+            constexpr units::radian_t frontRight = -0.62586416145_rad;
+            constexpr units::radian_t backLeft = -1.88372840752_rad;
+            constexpr units::radian_t backRight = 2.8854178620_rad;
         }
 
         // Turn motor profiled PIDF values
         namespace turnPID  
         {
-            constexpr double p = 4.5;
+            constexpr double p = 7.0;
             constexpr double i = 0.0;
             constexpr double d = 0.0;
-            constexpr double f = 0.10;
+            constexpr double f = 0.12;
 
             // Maximum angular velocity (rad/s)
             constexpr units::radians_per_second_t maxVelocity {10 * std::numbers::pi}; 
@@ -77,17 +80,19 @@ namespace constants
         // Drive motor feedforward values
         namespace driveFF
         {
-            constexpr auto s = 0.0_V; 
-            constexpr auto v = 0.0_V * 1.0_s / 1.0_m;
+            constexpr auto s = 0.2_V; 
+            constexpr auto v = 1.5_V * 1.0_s / 1.0_m;
             constexpr auto a = 0.0_V * 1.0_s * 1.0_s / 1.0_m;
         }
 
         // Heading lock PID values 
         namespace headingPID 
         {
-            constexpr double p = 0.0;
+            constexpr double p = 1.5;
             constexpr double i = 0.0;
             constexpr double d = 0.0;
+            constexpr units::radians_per_second_t ff = 0.15_rad_per_s;
+            constexpr units::radian_t tolerance = 1.0_deg;
         }
 
         // Preference keys for testing

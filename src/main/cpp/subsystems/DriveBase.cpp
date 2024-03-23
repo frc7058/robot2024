@@ -2,6 +2,7 @@
 
 #include <frc/Preferences.h>
 #include <frc/DriverStation.h>
+#include <frc/RobotController.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
@@ -10,43 +11,44 @@
 #include "constants/DriveConstants.h"
 #include "constants/AutoConstants.h"
 #include "constants/GeneralConstants.h"
+#include "lib/Util.h"
 
 DriveBase::DriveBase(Vision& vision)
     : m_vision(vision)
 {
-    frc::SmartDashboard::PutBoolean("Cosine scaling", true);
-    frc::SmartDashboard::PutNumber("Cosine scaling exponent", constants::drive::cosineScalingExponent);
+    // frc::SmartDashboard::PutBoolean("Cosine scaling", true);
+    // frc::SmartDashboard::PutNumber("Cosine scaling exponent", constants::drive::cosineScalingExponent);
 
     fmt::print("\nInitializing DriveBase...\n");
 
-    m_swerveModules[0] = std::move(std::make_unique<SwerveModule>(
+    m_swerveModules[0] = std::make_unique<SwerveModule>(
         "Swerve Module (FL)", 
         ports::drive::driveMotorCAN::frontLeft,
         ports::drive::turnMotorCAN::frontLeft,
         ports::drive::CANCoder::frontLeft,
-        constants::drive::encoderOffsets::frontLeft));
+        constants::drive::encoderOffsets::frontLeft);
 
-    m_swerveModules[1] = std::move(std::make_unique<SwerveModule>(
+    m_swerveModules[1] = std::make_unique<SwerveModule>(
         "Swerve Module (FR)", 
         ports::drive::driveMotorCAN::frontRight, 
         ports::drive::turnMotorCAN::frontRight, 
         ports::drive::CANCoder::frontRight,
-        constants::drive::encoderOffsets::frontRight));
+        constants::drive::encoderOffsets::frontRight);
     m_swerveModules[1]->SetDriveMotorInverted(true);
 
-    m_swerveModules[2] = std::move(std::make_unique<SwerveModule>(
+    m_swerveModules[2] = std::make_unique<SwerveModule>(
         "Swerve Module (BL)", 
         ports::drive::driveMotorCAN::backLeft, 
         ports::drive::turnMotorCAN::backLeft, 
         ports::drive::CANCoder::backLeft,
-        constants::drive::encoderOffsets::backLeft));
+        constants::drive::encoderOffsets::backLeft);
 
-    m_swerveModules[3] = std::move(std::make_unique<SwerveModule>(
+    m_swerveModules[3] = std::make_unique<SwerveModule>(
         "Swerve Module (BR)", 
         ports::drive::driveMotorCAN::backRight,
         ports::drive::turnMotorCAN::backRight,
         ports::drive::CANCoder::backRight,
-        constants::drive::encoderOffsets::backRight));
+        constants::drive::encoderOffsets::backRight);
     m_swerveModules[3]->SetDriveMotorInverted(true);
 
     // if(m_navX.IsAvailable())
@@ -73,7 +75,7 @@ DriveBase::DriveBase(Vision& vision)
             frc::Rotation2d(0.0_rad)
         ));
 
-    units::radian_t headingTolerance = 0.25_deg;
+    units::radian_t headingTolerance = constants::drive::headingPID::tolerance;
     m_headingPID = std::make_unique<frc::PIDController>(
         constants::drive::headingPID::p,
         constants::drive::headingPID::i,
@@ -112,7 +114,7 @@ DriveBase::DriveBase(Vision& vision)
 
         this
     );
-
+    
     frc::SmartDashboard::PutData("Field", &m_field);
     
     fmt::print("DriveBase Initialization complete\n\n");
@@ -120,6 +122,8 @@ DriveBase::DriveBase(Vision& vision)
 
 void DriveBase::Periodic()
 {
+    LoadPreferences();
+
     for(std::unique_ptr<SwerveModule>& swerveModule : m_swerveModules)
     {
         swerveModule->Periodic();
@@ -150,30 +154,29 @@ void DriveBase::Drive(units::meters_per_second_t velocityX, units::meters_per_se
     Drive(chassisSpeeds);
 }
 
-#include <iostream>
-
 void DriveBase::Drive(frc::ChassisSpeeds chassisSpeeds)
 {
     // If tracking an object, rotate towards
-    // if(m_tracking)
-    // {
-    //     double heading = GetHeading().value();
+    if(m_tracking)
+    {
+        double heading = GetHeading().value();
 
-    //     units::radians_per_second_t outputAngularVelocity { -m_headingPID->Calculate(heading) };
+        units::radians_per_second_t outputAngularVelocity { -m_headingPID->Calculate(heading) };
+        outputAngularVelocity += constants::drive::headingPID::ff * util::sign(outputAngularVelocity);
 
-    //     if(m_headingPID->AtSetpoint())
-    //     {
-    //         // std::cout << "At setpoint\n";
-    //         chassisSpeeds.omega = 0.0_rad_per_s;
-    //     }
-    //     else 
-    //     {
-    //         chassisSpeeds.omega = std::min(outputAngularVelocity, constants::drive::maxAngularVelocity);
-
-    //         // units::degree_t degreeError = units::radian_t {m_headingPID->GetPositionError()};         
-    //         // fmt::print("Error: {} ({}), output: {}", m_headingPID->GetPositionError(), degreeError, outputAngularVelocity);
-    //     }
-    // } 
+        if(m_headingPID->AtSetpoint())
+        {
+            // std::cout << "At setpoint\n";
+            chassisSpeeds.omega = 0.0_rad_per_s;
+        }
+        else 
+        {
+            chassisSpeeds.omega = std::min(outputAngularVelocity, constants::drive::maxAngularVelocity);
+            // fmt::print("Tracking output: {}\n", chassisSpeeds.omega);
+            // units::degree_t degreeError = units::radian_t {m_headingPID->GetPositionError()};         
+            // fmt::print("Error: {} ({}), output: {}", m_headingPID->GetPositionError(), degreeError, outputAngularVelocity);
+        }
+    } 
 
     units::radians_per_second_t angularVelocity = chassisSpeeds.omega;
     chassisSpeeds.omega *= constants::drive::angularVelocityFudgeFactor;
@@ -212,35 +215,10 @@ void DriveBase::Stop()
 
 void DriveBase::SetTargetModuleStates(const wpi::array<frc::SwerveModuleState, 4>& moduleStates)
 {
-    // Check if all drive speeds are zero
-    /*
-    bool moving = false;
-    for(const frc::SwerveModuleState& state : moduleStates)
-    {
-        if(state.speed != 0.0_mps)
-        {
-            moving = true;
-            break;
-        }
-    }
-    */
-
     for(size_t moduleIndex = 0; moduleIndex < 4; moduleIndex++)
     {
         frc::SwerveModuleState state = moduleStates[moduleIndex];
         m_swerveModules[moduleIndex]->SetTargetState(state);
-
-        /*
-        if(moving)
-        {
-            m_swerveModules[moduleIndex]->SetTargetState(state);
-        }
-        else 
-        {
-            // If not moving, set only the drive speed to zero to avoid each module resetting its angle
-            m_swerveModules[moduleIndex]->SetDriveVelocity(0.0_mps);
-        }
-        */
     }
 }
 
@@ -337,6 +315,55 @@ wpi::array<frc::SwerveModulePosition, 4> DriveBase::GetSwerveModulePositions() c
 bool DriveBase::IsNavXAvailable()
 {
     return m_navX.IsConnected() && !m_navX.IsCalibrating();
+}
+
+frc2::CommandPtr DriveBase::GetSysIdRoutine()
+{
+    m_sysIdRoutine = std::make_unique<frc2::sysid::SysIdRoutine>(
+        frc2::sysid::Config(std::nullopt, std::nullopt, std::nullopt, std::nullopt),
+
+        frc2::sysid::Mechanism(
+            [this] (units::volt_t voltage)
+            {
+                for(const auto& swerveModule : m_swerveModules)
+                {
+                    swerveModule->SetTurnAngle(0_rad);
+                    swerveModule->m_driveMotor->SetVoltage(voltage); 
+                }
+            },
+
+            [this] (frc::sysid::SysIdRoutineLog* log)
+            {
+                units::volt_t batteryVoltage = frc::RobotController::GetBatteryVoltage();
+
+                log->Motor("Drive Motor")
+                    .voltage(m_swerveModules[0]->m_driveMotor->Get() * batteryVoltage)
+                    .position(m_swerveModules[0]->GetDriveDistance())
+                    .velocity(m_swerveModules[0]->GetDriveVelocity());
+            },
+
+            this
+        )
+    );
+
+    units::second_t timeout = 5.0_s;
+
+    return this->RunOnce([this] { 
+            for(const auto& swerveModule : m_swerveModules)
+            {
+                swerveModule->SetTurnAngle(0_rad);
+            }
+        })
+        .AndThen(frc2::cmd::Wait(1.0_s))
+        .AndThen(m_sysIdRoutine->Quasistatic(frc2::sysid::Direction::kForward))
+        .AndThen(frc2::cmd::Wait(5.0_s))
+        .AndThen(m_sysIdRoutine->Quasistatic(frc2::sysid::Direction::kReverse))
+        .AndThen(frc2::cmd::Wait(5.0_s))
+        .AndThen(m_sysIdRoutine->Dynamic(frc2::sysid::Direction::kForward))
+            .WithTimeout(timeout)
+        .AndThen(frc2::cmd::Wait(5.0_s))
+        .AndThen(m_sysIdRoutine->Dynamic(frc2::sysid::Direction::kReverse))
+            .WithTimeout(timeout);
 }
 
 void DriveBase::InitializePreferences()

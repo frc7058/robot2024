@@ -27,11 +27,11 @@ public:
 private:
     frc::AprilTagFieldLayout m_fieldLayout { frc::LoadAprilTagLayoutField(constants::field::aprilTagField) };
 
-    // std::shared_ptr<photon::PhotonCamera> m_frontCamera;
-    // std::shared_ptr<photon::PhotonCamera> m_backCamera;
+    std::shared_ptr<photon::PhotonCamera> m_frontCamera;
+    std::shared_ptr<photon::PhotonCamera> m_backCamera;
 
-    // std::unique_ptr<photon::PhotonPoseEstimator> m_frontEstimator;
-    // std::unique_ptr<photon::PhotonPoseEstimator> m_backEstimator;
+    std::unique_ptr<photon::PhotonPoseEstimator> m_frontEstimator;
+    std::unique_ptr<photon::PhotonPoseEstimator> m_backEstimator;
 
     photon::PhotonCamera m_objectDetectionCamera {constants::vision::objectCamera::name};
 };

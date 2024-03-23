@@ -42,12 +42,13 @@ public:
     void UpdateDriveController(double p, double i, double d, double ff_S, double ff_V);
 
     void UpdateTurnEncoderOffset(units::radian_t offset);
+    
+    std::unique_ptr<rev::CANSparkMax> m_driveMotor {};
+    std::unique_ptr<rev::CANSparkMax> m_turnMotor {};
 
 private:
     const std::string m_name {};
 
-    std::unique_ptr<rev::CANSparkMax> m_driveMotor {};
-    std::unique_ptr<rev::CANSparkMax> m_turnMotor {};
 
     std::unique_ptr<rev::SparkRelativeEncoder> m_driveEncoder {};
     

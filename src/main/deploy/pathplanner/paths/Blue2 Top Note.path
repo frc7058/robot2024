@@ -3,67 +3,72 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.6230802761177547,
-        "y": 6.476092609817173
+        "x": 1.35,
+        "y": 5.55
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.813006710178897,
-        "y": 6.979658581285779
+        "x": 3.2228859892812496,
+        "y": 5.6212015419751244
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Blue 2, Red 2 Start"
     },
     {
       "anchor": {
-        "x": 2.530715376034888,
-        "y": 6.919255512191481
+        "x": 2.883271729453586,
+        "y": 6.95
       },
       "prevControl": {
-        "x": 2.6718610431068925,
-        "y": 6.94945704673863
+        "x": 2.900886564048551,
+        "y": 6.324099554471463
       },
       "nextControl": {
-        "x": 2.3895697089628833,
-        "y": 6.889053977644332
+        "x": 2.8715608929078047,
+        "y": 7.366116187296568
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.85,
-        "y": 7.0
+        "x": 1.35,
+        "y": 5.55
       },
       "prevControl": {
-        "x": 2.7778742005415524,
-        "y": 6.979658581285779
+        "x": 3.4453918836510984,
+        "y": 5.269876445601678
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6,
+      "rotationDegrees": 90.0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1.4,
+      "rotationDegrees": 90.0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "New Event Marker",
-      "waypointRelativePos": 0.5,
+      "name": "Intake In",
+      "waypointRelativePos": 0.25,
       "command": {
-        "type": "race",
+        "type": "parallel",
         "data": {
           "commands": [
             {
               "type": "named",
               "data": {
                 "name": "RunIntake"
-              }
-            },
-            {
-              "type": "wait",
-              "data": {
-                "waitTime": 0.5
               }
             }
           ]
@@ -72,20 +77,20 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 1.0,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 2.5,
+    "maxAcceleration": 2.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
     "rotation": 0,
-    "rotateFast": true
+    "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": -125.0,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true

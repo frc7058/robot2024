@@ -2,6 +2,7 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <frc/DigitalInput.h>
+#include <frc/filter/Debouncer.h>
 #include <rev/CANSparkMax.h>
 #include <units/voltage.h>
 #include <memory>
@@ -21,4 +22,6 @@ public:
 private:
     std::unique_ptr<rev::CANSparkMax> m_intakeMotor;
     std::unique_ptr<frc::DigitalInput> m_photoElectricSensor; 
+    
+    std::unique_ptr<frc::Debouncer> m_debouncer;
 };

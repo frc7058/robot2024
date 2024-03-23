@@ -2,6 +2,7 @@
 
 #include <frc2/command/Commands.h>
 #include "subsystems/Intake.h"
+#include "subsystems/Shooter.h"
 
 namespace IntakeCommands 
 {
@@ -11,7 +12,7 @@ namespace IntakeCommands
     // Feeds note from intake into the shooter
     // frc2::CommandPtr FeedShooter(Intake* intake);
 
-    frc2::CommandPtr EjectIntake(Intake* intake);
+    frc2::CommandPtr EjectIntake(Intake* intake, Shooter* shooter);
 
     frc2::CommandPtr RunFeeder(Intake* intake);
     frc2::CommandPtr StopIntake(Intake* intake);

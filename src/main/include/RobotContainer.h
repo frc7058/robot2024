@@ -7,6 +7,7 @@
 #include <frc2/command/CommandPtr.h>
 #include <frc/XboxController.h>
 #include <frc/PowerDistribution.h>
+#include <frc/smartdashboard/SendableChooser.h>
 
 #include "subsystems/DriveBase.h"
 #include "subsystems/Intake.h"
@@ -34,10 +35,11 @@ class RobotContainer {
   frc::PowerDistribution m_pdh {ports::pdh::pdhCAN, frc::PowerDistribution::ModuleType::kRev};
 
   Vision m_vision {};
-  // NavX m_navX {};
 
   DriveBase m_driveBase {m_vision};
   Intake m_intake {};
   Shooter m_shooter {};
   Climber m_climber {m_pdh};
+
+  frc::SendableChooser<std::string> m_autoChooser;
 };

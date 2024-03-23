@@ -23,5 +23,11 @@ namespace ShooterCommands
 
     // Shoots a note at a specified speed
     frc2::CommandPtr Shoot(Shooter* shooter, Intake* intake, units::revolutions_per_minute_t speed);
-    frc2::CommandPtr ShootTest(Shooter* shooter, Intake* intake);
+    frc2::CommandPtr Shoot(Shooter* shooter, Intake* intake, units::volt_t voltage);
+
+    frc2::CommandPtr ShootToSpeaker(Shooter* shooter, Intake* intake);
+    
+    frc2::CommandPtr ShootToAmp(Shooter* shooter, Intake* intake);
+
+    frc2::CommandPtr ShooterIntake(Shooter* shooter, Intake* intake);
 }

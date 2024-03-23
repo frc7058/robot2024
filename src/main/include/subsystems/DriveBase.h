@@ -4,11 +4,11 @@
 #include <frc2/command/sysid/SysIdRoutine.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
-// #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/smartdashboard/Field2d.h>
 #include <frc/controller/PIDController.h>
+#include <frc2/command/sysid/SysIdRoutine.h>
 #include <AHRS.h>
 #include <array>
 
@@ -57,10 +57,10 @@ public:
 
     bool IsNavXAvailable();
 
+    frc2::CommandPtr GetSysIdRoutine();
+
     void InitializePreferences();
     void LoadPreferences();
-
-    // frc2::sysid::SysIdRoutine GetSysIdRoutine();
 
 private:
     // Swerve modules (ordered clockwise starting at front left module)
@@ -71,10 +71,9 @@ private:
 
     // Swerve odometry
     std::unique_ptr<frc::SwerveDrivePoseEstimator<4>> m_poseEstimator {};
-    // std::unique_ptr<frc::SwerveDriveOdometry<4>> m_odometry {};
+    frc::Field2d m_field;
 
     // NavX IMU 
-    // NavX& m_navX;
     AHRS m_navX {frc::SerialPort::kUSB1};
 
     // Vision class for AprilTag pose estimation
@@ -84,5 +83,7 @@ private:
     std::unique_ptr<frc::PIDController> m_headingPID {};
     bool m_tracking = false;
 
-    frc::Field2d m_field;
+    bool m_slowMode = false;
+
+    std::unique_ptr<frc2::sysid::SysIdRoutine> m_sysIdRoutine;
 };

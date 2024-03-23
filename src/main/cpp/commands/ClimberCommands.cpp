@@ -17,7 +17,7 @@ namespace ClimberCommands
             [climber] {climber->Stop(); },
 
             {climber}
-        ).Until([climber] { return climber->ReachedMaxPosition() || climber->CurrentLimitReached(); });
+        ).Until([climber] { return climber->ReachedMaxPosition(); /*  || climber->CurrentLimitReached(); */ });
     }
 
     frc2::CommandPtr LowerHook(Climber* climber)
@@ -33,7 +33,7 @@ namespace ClimberCommands
             [climber] {climber->Stop(); },
 
             {climber}
-        ).Until([climber] { return climber->ReachedMinPosition() || climber->CurrentLimitReached(); });
+        ).Until([climber] { return climber->ReachedMinPosition(); /*  || climber->CurrentLimitReached();  */});
     }
 
     frc2::CommandPtr StopClimber(Climber* climber)

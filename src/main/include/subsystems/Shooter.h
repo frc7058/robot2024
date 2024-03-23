@@ -3,7 +3,9 @@
 #include <frc2/command/SubsystemBase.h>
 #include <frc2/command/sysid/SysIdRoutine.h>
 #include <frc/controller/PIDController.h>
+#include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
+#include <frc/filter/Debouncer.h>
 #include <rev/CANSparkMax.h>
 #include <units/angle.h>
 #include <memory>
@@ -26,7 +28,7 @@ public:
 
     bool AtSpeed() const;
 
-    frc2::sysid::SysIdRoutine GetSysIdRoutine();
+    frc2::CommandPtr GetSysIdRoutine();
 
 private:
     std::unique_ptr<rev::CANSparkMax> m_feedMotor;
@@ -36,10 +38,16 @@ private:
     std::unique_ptr<rev::SparkRelativeEncoder> m_leftEncoder;
     std::unique_ptr<rev::SparkRelativeEncoder> m_rightEncoder;
 
-    std::unique_ptr<frc::PIDController> m_leftPID;
-    std::unique_ptr<frc::PIDController> m_rightPID;
+    std::unique_ptr<frc::ProfiledPIDController<units::turns_per_second>> m_leftPID;
+    std::unique_ptr<frc::ProfiledPIDController<units::turns_per_second>> m_rightPID;
 
-    std::unique_ptr<frc::SimpleMotorFeedforward<units::radians>> m_feedForward;
+    //std::unique_ptr<frc::SimpleMotorFeedforward<units::radians>> m_feedForward;
+    std::unique_ptr<frc::SimpleMotorFeedforward<units::turns>> m_feedForward;
+
+    //std::unique_ptr<frc::Debouncer> m_debouncer;
+
+    std::unique_ptr<frc2::sysid::SysIdRoutine> m_sysIdRoutine;
     
     units::radians_per_second_t m_targetSpeed {0};
+    bool m_atSpeed = false;
 };

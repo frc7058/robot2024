@@ -4,6 +4,7 @@
 
 #include <units/voltage.h>
 #include <frc/RobotController.h>
+#include <frc2/command/Commands.h>
 
 Shooter::Shooter()
 {
@@ -22,11 +23,8 @@ Shooter::Shooter()
         rev::CANSparkBase::MotorType::kBrushless);
         
     m_feedMotor->SetInverted(true);
-    m_leftMotor->SetInverted(true);
-    m_rightMotor->SetInverted(false);
-
-    m_leftMotor->SetSmartCurrentLimit(60);
-    m_rightMotor->SetSmartCurrentLimit(60);
+    m_leftMotor->SetInverted(false);
+    m_rightMotor->SetInverted(true);
 
     m_feedMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
     m_leftMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
@@ -41,28 +39,34 @@ Shooter::Shooter()
     // m_rightMotor->BurnFlash();
 
     m_leftEncoder = std::make_unique<rev::SparkRelativeEncoder>(m_leftMotor->GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor));
-    m_leftEncoder->SetPositionConversionFactor(1.0 / constants::shooter::shooterGearReduction);
-    m_leftEncoder->SetVelocityConversionFactor(1.0 / constants::shooter::shooterGearReduction);
-
+    m_leftEncoder->SetAverageDepth(constants::shooter::encoderDepth);
+    m_leftEncoder->SetMeasurementPeriod(constants::shooter::encoderPeriod);
+    
     m_rightEncoder = std::make_unique<rev::SparkRelativeEncoder>(m_rightMotor->GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor));
-    m_rightEncoder->SetPositionConversionFactor(1.0 / constants::shooter::shooterGearReduction);
-    m_rightEncoder->SetVelocityConversionFactor(1.0 / constants::shooter::shooterGearReduction);
+    m_rightEncoder->SetAverageDepth(constants::shooter::encoderDepth);
+    m_rightEncoder->SetMeasurementPeriod(constants::shooter::encoderPeriod);
 
-    m_leftPID = std::make_unique<frc::PIDController>(
+    m_leftPID = std::make_unique<frc::ProfiledPIDController<units::turns_per_second>>(
         constants::shooter::pid::p,
         constants::shooter::pid::i,
-        constants::shooter::pid::d
-    );
-    m_leftPID->SetTolerance(constants::shooter::tolerance.value());
+        constants::shooter::pid::d,
+        frc::TrapezoidProfile<units::turns_per_second>::Constraints(
+            constants::shooter::pid::v,
+            constants::shooter::pid::a
+        ));
+    m_leftPID->SetTolerance(units::turns_per_second_t {1.0});
 
-    m_rightPID = std::make_unique<frc::PIDController>(
+    m_rightPID = std::make_unique<frc::ProfiledPIDController<units::turns_per_second>>(
         constants::shooter::pid::p,
         constants::shooter::pid::i,
-        constants::shooter::pid::d
-    );
-    m_rightPID->SetTolerance(constants::shooter::tolerance.value());
+        constants::shooter::pid::d,
+        frc::TrapezoidProfile<units::turns_per_second>::Constraints(
+            constants::shooter::pid::v,
+            constants::shooter::pid::a
+        ));
+    m_rightPID->SetTolerance(units::turns_per_second_t {1.0});
 
-    m_feedForward = std::make_unique<frc::SimpleMotorFeedforward<units::radians>>(
+    m_feedForward = std::make_unique<frc::SimpleMotorFeedforward<units::turns>>(
         constants::shooter::feedforward::s,
         constants::shooter::feedforward::v,
         constants::shooter::feedforward::a
@@ -73,44 +77,49 @@ Shooter::Shooter()
 
 void Shooter::Periodic()
 {
-    units::revolutions_per_minute_t leftRPM = GetLeftSpeed();
-    units::revolutions_per_minute_t rightRPM = GetRightSpeed();
+    units::turns_per_second_t leftSpeed = GetLeftSpeed();
+    units::turns_per_second_t rightSpeed = GetRightSpeed();
 
-    units::volt_t feedforwardOutput = m_feedForward->Calculate(m_targetSpeed);
-
-    units::volt_t leftOutput { m_leftPID->Calculate(leftRPM.value()) };
-    leftOutput += feedforwardOutput;
+    units::volt_t leftOutputPID { m_leftPID->Calculate(leftSpeed) };
+    leftOutputPID = std::clamp(leftOutputPID, -constants::shooter::pid::maxOutput, constants::shooter::pid::maxOutput);
+    units::volt_t leftOutputFF = m_feedForward->Calculate(m_leftPID->GetSetpoint().position);
+    units::volt_t leftOutput = leftOutputPID + leftOutputFF;
     leftOutput = std::clamp(leftOutput, -constants::shooter::maxVoltage, constants::shooter::maxVoltage);
 
-    units::volt_t rightOutput { m_rightPID->Calculate(rightRPM.value()) };
-    rightOutput += feedforwardOutput;
-    rightOutput = std::clamp(leftOutput, -constants::shooter::maxVoltage, constants::shooter::maxVoltage);
-    
-    // fmt::print("Left: {}          Right: {}\n", m_leftEncoder->GetVelocity(), m_rightEncoder->GetVelocity());
+    units::volt_t rightOutputPID { m_rightPID->Calculate(rightSpeed) };
+    rightOutputPID = std::clamp(rightOutputPID, -constants::shooter::pid::maxOutput, constants::shooter::pid::maxOutput);
+    units::volt_t rightOutputFF = m_feedForward->Calculate(m_rightPID->GetSetpoint().position);
+    units::volt_t rightOutput = rightOutputPID + rightOutputFF;
+    rightOutput = std::clamp(rightOutput, -constants::shooter::maxVoltage, constants::shooter::maxVoltage);
 
+    
+    if(std::abs(m_leftEncoder->GetVelocity()) + std::abs(m_rightEncoder->GetVelocity()) > 10)
+    {
+        fmt::print("Left: {}       Right: {}\n", leftSpeed, rightSpeed);
+    }
+ 
     // m_leftMotor->SetVoltage(leftOutput);
     // m_rightMotor->SetVoltage(rightOutput);
 }
 
 void Shooter::SetShooterVoltage(const units::volt_t voltage)
 {
-    // Might need to invert this.
     m_leftMotor->SetVoltage(voltage);
     m_rightMotor->SetVoltage(voltage);
 }
 
 void Shooter::SetShooterSpeed(const units::revolutions_per_minute_t speed)
 {
-    m_leftPID->SetSetpoint(speed.value());
-    m_rightPID->SetSetpoint(speed.value());
+    m_leftPID->SetGoal(speed);
+    m_rightPID->SetGoal(speed);
 
     m_targetSpeed = speed;
 }
 
 void Shooter::StopShooter()
 {
-    m_leftPID->SetSetpoint(0);
-    m_rightPID->SetSetpoint(0);
+    m_leftPID->SetGoal(units::turns_per_second_t {0.0});
+    m_rightPID->SetGoal(units::turns_per_second_t {0.0});
 
     m_targetSpeed = 0.0_rad_per_s;
 
@@ -140,12 +149,19 @@ void Shooter::StopFeeder()
 
 bool Shooter::AtSpeed() const 
 {
-    return m_leftPID->AtSetpoint() && m_rightPID->AtSetpoint();
+    bool atSpeed = m_leftPID->AtGoal() && m_rightPID->AtGoal();
+    if(atSpeed)
+    {
+        fmt::print("Goal: {} and {}\n", m_leftPID->GetGoal().position, m_rightPID->GetGoal().position);
+        fmt::print("At goal: {} and {}\n", GetLeftSpeed(), GetRightSpeed());
+    }
+
+    return atSpeed;
 }
 
-frc2::sysid::SysIdRoutine Shooter::GetSysIdRoutine()
+frc2::CommandPtr Shooter::GetSysIdRoutine()
 {
-    return frc2::sysid::SysIdRoutine(
+    m_sysIdRoutine = std::make_unique<frc2::sysid::SysIdRoutine>(
         frc2::sysid::Config(std::nullopt, std::nullopt, std::nullopt, std::nullopt),
 
         frc2::sysid::Mechanism(
@@ -161,16 +177,24 @@ frc2::sysid::SysIdRoutine Shooter::GetSysIdRoutine()
 
                 log->Motor("Left Motor")
                     .voltage(m_leftMotor->Get() * batteryVoltage)
-                    .position(units::meter_t {m_leftEncoder->GetPosition()})
-                    .velocity(units::meters_per_second_t {m_leftEncoder->GetVelocity()});
+                    .position(units::turn_t {m_leftEncoder->GetPosition()})
+                    .velocity(units::turns_per_second_t {m_leftEncoder->GetVelocity() / 60.0});
 
                 log->Motor("Right Motor")
                     .voltage(m_rightMotor->Get() * batteryVoltage)
-                    .position(units::meter_t {m_rightEncoder->GetPosition()})
-                    .velocity(units::meters_per_second_t {m_rightEncoder->GetVelocity()});
+                    .position(units::turn_t {m_rightEncoder->GetPosition()})
+                    .velocity(units::turns_per_second_t {m_rightEncoder->GetVelocity() / 60.0});
             },
 
             this
         )
     );
+
+    return m_sysIdRoutine->Quasistatic(frc2::sysid::Direction::kForward)
+        .AndThen(frc2::cmd::Wait(5.0_s))
+        .AndThen(m_sysIdRoutine->Quasistatic(frc2::sysid::Direction::kReverse))
+        .AndThen(frc2::cmd::Wait(5.0_s))
+        .AndThen(m_sysIdRoutine->Dynamic(frc2::sysid::Direction::kForward))
+        .AndThen(frc2::cmd::Wait(5.0_s))
+        .AndThen(m_sysIdRoutine->Dynamic(frc2::sysid::Direction::kReverse));
 }

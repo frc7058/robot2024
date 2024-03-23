@@ -6,29 +6,29 @@
 
 Vision::Vision()
 {
-    // m_frontEstimator = std::make_unique<photon::PhotonPoseEstimator>(
-    //     m_fieldLayout, 
-    //     constants::vision::poseStrategy, 
-    //     photon::PhotonCamera(constants::vision::frontCamera::name),
-    //     frc::Transform3d(
-    //         constants::vision::frontCamera::relativePosition,
-    //         constants::vision::frontCamera::relativeRotation
-    //     ));
+    m_frontEstimator = std::make_unique<photon::PhotonPoseEstimator>(
+        m_fieldLayout, 
+        constants::vision::poseStrategy, 
+        photon::PhotonCamera(constants::vision::frontCamera::name),
+        frc::Transform3d(
+            constants::vision::frontCamera::relativePosition,
+            constants::vision::frontCamera::relativeRotation
+        ));
 
-    // m_backEstimator = std::make_unique<photon::PhotonPoseEstimator>(
-    //     m_fieldLayout, 
-    //     constants::vision::poseStrategy, 
-    //     photon::PhotonCamera(constants::vision::backCamera::name),
-    //     frc::Transform3d(
-    //         constants::vision::backCamera::relativePosition,
-    //         constants::vision::backCamera::relativeRotation
-    //     ));
+    m_backEstimator = std::make_unique<photon::PhotonPoseEstimator>(
+        m_fieldLayout, 
+        constants::vision::poseStrategy, 
+        photon::PhotonCamera(constants::vision::backCamera::name),
+        frc::Transform3d(
+            constants::vision::backCamera::relativePosition,
+            constants::vision::backCamera::relativeRotation
+        ));
 
-    // m_frontCamera = m_frontEstimator->GetCamera();
-    // // m_backCamera = m_frontEstimator->GetCamera();
+    m_frontCamera = m_frontEstimator->GetCamera();
+    m_backCamera = m_frontEstimator->GetCamera();
 
-    // m_frontEstimator->SetMultiTagFallbackStrategy(constants::vision::backupPoseStrategy);
-    // m_backEstimator->SetMultiTagFallbackStrategy(constants::vision::backupPoseStrategy);
+    m_frontEstimator->SetMultiTagFallbackStrategy(constants::vision::backupPoseStrategy);
+    m_backEstimator->SetMultiTagFallbackStrategy(constants::vision::backupPoseStrategy);
 
     wpi::PortForwarder::GetInstance().Add(5800, "photonvision.local", 5800);
 }
@@ -54,6 +54,7 @@ std::optional<VisionPoseResult> Vision::GetEstimatedPose(photon::PhotonPoseEstim
         frc::Pose2d estimatedPose2D = estimatedPose->estimatedPose.ToPose2d();
 
         units::meter_t averageDistance = 0.0_m;
+        double averageAmbiguity = 0.0;
 
         for(const photon::PhotonTrackedTarget& target : estimatedPose->targetsUsed)
         {
@@ -62,15 +63,17 @@ std::optional<VisionPoseResult> Vision::GetEstimatedPose(photon::PhotonPoseEstim
             if(tagPose.has_value())
             {
                 averageDistance += tagPose.value().ToPose2d().Translation().Distance(estimatedPose2D.Translation());
+                averageAmbiguity += target.GetPoseAmbiguity();
             }
         }
 
         averageDistance /= numTargets;
+        averageAmbiguity /= numTargets;
         
         double doubleMax = std::numeric_limits<double>::max();
         wpi::array<double, 3U> stdDevs { doubleMax, doubleMax, doubleMax };
 
-        if(numTargets > 1)
+        if(numTargets > 1 && averageAmbiguity <= constants::vision::maxMultiTagAmbiguity && averageDistance <= constants::vision::maxTagDistance)
         {
             // Use pose estimation if more than one target was used
             stdDevs = constants::vision::multiTagStdDevs;
@@ -78,8 +81,8 @@ std::optional<VisionPoseResult> Vision::GetEstimatedPose(photon::PhotonPoseEstim
             fmt::print("Using two targets\n");
         }
         else if(numTargets == 1 && 
-            estimatedPose->targetsUsed[0].GetPoseAmbiguity() <= constants::vision::maxAmbiguity &&
-            averageDistance <= constants::vision::maxSingleTagDistance)
+            averageAmbiguity <= constants::vision::maxAmbiguity &&
+            averageDistance <= constants::vision::maxTagDistance)
         {
             // Use pose estimation if one target was used, is below ambiguity threshold, and is within max range
             stdDevs = constants::vision::singleTagStdDevs;
@@ -111,8 +114,8 @@ std::vector<std::optional<VisionPoseResult>> Vision::GetEstimatedPoses(frc::Pose
 {
     std::vector<std::optional<VisionPoseResult>> poses;
 
-    // poses.push_back(GetEstimatedPose(*m_frontEstimator, prevPose));
-    // poses.push_back(GetEstimatedPose(*m_backEstimator, prevPose));
+    poses.push_back(GetEstimatedPose(*m_frontEstimator, prevPose));
+    poses.push_back(GetEstimatedPose(*m_backEstimator, prevPose));
 
     return poses;
 }

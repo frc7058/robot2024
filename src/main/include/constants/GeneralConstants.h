@@ -11,11 +11,12 @@ namespace constants
     constexpr double pi = 3.14159265358979323846;
     constexpr units::radian_t piRadians { pi };
 
-    constexpr bool enableSysId = true;
+    constexpr bool enableSysId = false;
 
     namespace controls 
     {
         constexpr double joystickDeadband = 0.08;
+        constexpr double axisDeadband = 0.05;
     }
     
     namespace LED

@@ -1,5 +1,6 @@
 #include "commands/IntakeCommands.h"
 #include "constants/IntakeConstants.h"
+#include "constants/ShooterConstants.h"
 #include <frc2/command/FunctionalCommand.h>
 
 namespace IntakeCommands 
@@ -17,7 +18,7 @@ namespace IntakeCommands
             [intake] (bool interrupted) { intake->StopIntake(); },
 
             // IsFinished
-            [intake] { return false; /* return intake->IsNoteDetected(); */ },
+            [intake] { return intake->IsNoteDetected(); },
 
             // Requirements
             {intake}
@@ -38,9 +39,12 @@ namespace IntakeCommands
     //     ).WithTimeout(constants::intake::feedToShooterTime);
     // }
 
-    frc2::CommandPtr EjectIntake(Intake* intake)
+    frc2::CommandPtr EjectIntake(Intake* intake, Shooter* shooter)
     {
-        return intake->RunOnce([intake] { intake->RunIntake(-constants::intake::intakePower); });
+        return intake->RunOnce([intake, shooter] { 
+            intake->RunIntake(constants::intake::ejectPower); 
+            shooter->RunFeeder(-constants::shooter::feedMotorPower);
+        });
     }
 
     frc2::CommandPtr RunFeeder(Intake* intake)

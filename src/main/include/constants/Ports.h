@@ -37,8 +37,8 @@ namespace ports
     namespace shooter 
     {
         constexpr int feedMotorCAN = 15;
-        constexpr int leftMotorCAN = 16;
-        constexpr int rightMotorCAN = 17;
+        constexpr int leftMotorCAN = 17;
+        constexpr int rightMotorCAN = 16;
     }
 
     namespace climber
