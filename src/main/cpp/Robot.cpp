@@ -5,6 +5,7 @@
 #include "Robot.h"
 
 #include <frc2/command/CommandScheduler.h>
+#include <frc/DriverStation.h>
 #include "constants/GeneralConstants.h"
 
 void Robot::RobotInit() 
@@ -21,7 +22,15 @@ void Robot::RobotPeriodic() {
 
 void Robot::DisabledInit() {}
 
-void Robot::DisabledPeriodic() {}
+void Robot::DisabledPeriodic() 
+{
+  // std::optional<frc::DriverStation::Alliance> alliance = frc::DriverStation::GetAlliance();
+
+  // if(alliance)
+  // {
+  //   m_container.ConfigurePathPlanner();
+  // }
+}
 
 void Robot::DisabledExit() {}
 

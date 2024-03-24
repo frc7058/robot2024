@@ -85,7 +85,15 @@ DriveBase::DriveBase(Vision& vision)
     m_headingPID->EnableContinuousInput(-constants::pi, constants::pi);
 
     InitializePreferences();
+    ConfigurePathPlanner();
 
+    frc::SmartDashboard::PutData("Field", &m_field);
+    
+    fmt::print("DriveBase Initialization complete\n\n");
+}
+
+void DriveBase::ConfigurePathPlanner()
+{
     pathplanner::AutoBuilder::configureHolonomic(
         // Get pose
         [this] () { return this->GetPose(); },
@@ -114,10 +122,6 @@ DriveBase::DriveBase(Vision& vision)
 
         this
     );
-    
-    frc::SmartDashboard::PutData("Field", &m_field);
-    
-    fmt::print("DriveBase Initialization complete\n\n");
 }
 
 void DriveBase::Periodic()

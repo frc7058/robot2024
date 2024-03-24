@@ -23,6 +23,7 @@ class RobotContainer {
 
   frc2::CommandPtr GetAutonomousCommand();
 
+  void ConfigurePathPlanner();
   void InitSysId();
 
  private:

@@ -21,6 +21,8 @@ class DriveBase : public frc2::SubsystemBase
 public:
     DriveBase(Vision& vision);
 
+    void ConfigurePathPlanner();
+
     void Periodic() override;
 
     void Drive(units::meters_per_second_t velocityX, 

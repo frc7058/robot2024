@@ -18,8 +18,9 @@ namespace constants
         constexpr units::turns_per_second_t tolerance = 30_rpm;
         constexpr units::millisecond_t debounceTime = 40_ms;
 
-        // constexpr units::revolutions_per_minute_t speakerShootSpeed = 4000.0_rpm;
-        // constexpr units::revolutions_per_minute_t ampShootSpeed = 1000.0_rpm;
+        constexpr units::revolutions_per_minute_t speakerShootSpeed = 4000.0_rpm;
+        constexpr units::revolutions_per_minute_t ampShootSpeed = 1000.0_rpm;
+        
         constexpr units::volt_t speakerShootPower = 7.0_V;
         constexpr units::volt_t ampShootPower = 2.5_V;
 

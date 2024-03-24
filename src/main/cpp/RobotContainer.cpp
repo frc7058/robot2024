@@ -7,6 +7,7 @@
 #include <frc2/command/Commands.h>
 #include <frc2/command/FunctionalCommand.h>
 #include <frc2/command/button/JoystickButton.h>
+#include <frc2/command/button/POVButton.h>
 #include <frc2/command/button/Trigger.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
@@ -155,6 +156,9 @@ void RobotContainer::ConfigureShooterControls()
   frc2::JoystickButton(&m_shooterController, frc::XboxController::Button::kRightBumper)
     .OnTrue(ClimberCommands::LowerHook(&m_climber))
     .OnFalse(ClimberCommands::StopClimber(&m_climber));
+
+  frc2::POVButton(&m_shooterController, 0)
+    .WhileTrue(ShooterCommands::RunShooterWheels(&m_shooter, constants::shooter::speakerShootSpeed));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
@@ -166,13 +170,18 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   if(autoName == constants::autonomous::oneNoteAuto)
     return ShooterCommands::ShootToSpeaker(&m_shooter, &m_intake);
 
-  frc::Pose2d startingPose = pathplanner::PathPlannerAuto::getStartingPoseFromAutoFile(autoName);  
+  // frc::Pose2d startingPose = pathplanner::PathPlannerAuto::getStartingPoseFromAutoFile(autoName);  
   // startingPose = frc::Pose2d(startingPose.X(), startingPose.Y(), m_driveBase.GetPose().Rotation());
-  m_driveBase.ResetPose(startingPose);
+  // m_driveBase.ResetPose(startingPose);
 
   return pathplanner::PathPlannerAuto(autoName).ToPtr()
     .OnlyWhile([&] { return m_driveBase.IsNavXAvailable(); })
     .FinallyDo([&] { m_driveBase.Stop(); });
+}
+
+void RobotContainer::ConfigurePathPlanner()
+{
+  m_driveBase.ConfigurePathPlanner();
 }
 
 void RobotContainer::InitSysId()
