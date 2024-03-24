@@ -194,3 +194,8 @@ void RobotContainer::InitSysId()
   frc2::JoystickButton(&m_driveController, frc::XboxController::Button::kX)
      .WhileTrue(m_driveBase.GetSysIdRoutine());
 }
+
+void RobotContainer::SetDriveControlMode(ControlMode controlMode)
+{
+  m_driveBase.SetDriveControlMode(controlMode);
+}

@@ -11,6 +11,12 @@
 #include <memory>
 #include <string>
 
+enum class ControlMode
+{
+    OpenLoop,
+    ClosedLoop
+};
+
 class SwerveModule
 {
 public:
@@ -38,6 +44,8 @@ public:
     void SetTurnMotorInverted(bool inverted);
     void SetDriveMotorInverted(bool inverted);
 
+    void SetControlMode(ControlMode controlMode);
+
     void UpdateTurnController(double p, double i, double d, double f, units::radians_per_second_t v, units::radians_per_second_squared_t a);
     void UpdateDriveController(double p, double i, double d, double ff_S, double ff_V);
 
@@ -49,12 +57,12 @@ public:
 private:
     const std::string m_name {};
 
-
     std::unique_ptr<rev::SparkRelativeEncoder> m_driveEncoder {};
     
     std::unique_ptr<ctre::phoenix6::hardware::CANcoder> m_turnEncoder {};
     units::radian_t m_encoderOffset {0};
 
+    ControlMode m_controlMode {ControlMode::ClosedLoop};
     std::unique_ptr<frc::PIDController> m_drivePID {};
     std::unique_ptr<frc::ProfiledPIDController<units::radians>> m_turnPID {}; 
     double m_turnPID_F {};

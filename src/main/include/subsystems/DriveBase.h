@@ -42,9 +42,8 @@ public:
     void DisableTracking();
     bool IsTrackingEnabled() const;
 
-    // void LockHeading();
-    // void UnlockHeading();
-    // bool IsHeadingLocked() const;
+    void SetDriveControlMode(ControlMode controlMode);
+    ControlMode GetDriveControlMode() const;
 
     units::radian_t GetHeading();
     void ZeroHeading();
@@ -81,11 +80,12 @@ private:
     // Vision class for AprilTag pose estimation
     Vision& m_vision;
 
+    // Driving control mode
+    ControlMode m_controlMode {ControlMode::ClosedLoop};
+
     // PID controller to lock/maintain heading
     std::unique_ptr<frc::PIDController> m_headingPID {};
     bool m_tracking = false;
-
-    bool m_slowMode = false;
 
     std::unique_ptr<frc2::sysid::SysIdRoutine> m_sysIdRoutine;
 };

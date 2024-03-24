@@ -26,6 +26,8 @@ class RobotContainer {
   void ConfigurePathPlanner();
   void InitSysId();
 
+  void SetDriveControlMode(ControlMode controlMode);
+
  private:
   void ConfigureDriveControls();
   void ConfigureShooterControls();

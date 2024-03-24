@@ -9,21 +9,16 @@ SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorC
 {
     fmt::print("Initializing Swerve Module {}\n", name);
 
-    fmt::print("Initializing Drive Motor\n");
     m_driveMotor = std::make_unique<rev::CANSparkMax>(driveMotorCanID, rev::CANSparkMax::MotorType::kBrushless);
     
-    fmt::print("Setting idle mode\n");
     m_driveMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
 
-    fmt::print("Initializing Turn Motor\n");
     m_turnMotor = std::make_unique<rev::CANSparkMax>(turnMotorCanID, rev::CANSparkMax::MotorType::kBrushless);
     m_turnMotor->SetInverted(true);
     m_turnMotor->SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
 
-    fmt::print("Initializing Turn Encoder\n");
     m_turnEncoder = std::make_unique<ctre::phoenix6::hardware::CANcoder>(canCoderCanID);
 
-    fmt::print("Initializing Drive Encoder\n");
     m_driveEncoder = std::make_unique<rev::SparkRelativeEncoder>(m_driveMotor->GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor));
     m_driveEncoder->SetAverageDepth(constants::drive::driveEncoderDepth);
     m_driveEncoder->SetMeasurementPeriod(constants::drive::driveEncoderPeriod);
@@ -34,14 +29,12 @@ SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorC
     units::meter_t velocityConversionFactor = positionConversionFactor / 60.0;
     m_driveEncoder->SetVelocityConversionFactor(velocityConversionFactor.value());
 
-    fmt::print("Initializing Drive PID\n");
     m_drivePID = std::make_unique<frc::PIDController>(
         constants::drive::drivePID::p,
         constants::drive::drivePID::i,
         constants::drive::drivePID::d);
     m_drivePID->SetSetpoint(0);
 
-    fmt::print("Initializing Turn Motor\n");
     m_turnPID = std::make_unique<frc::ProfiledPIDController<units::radians>>(
         constants::drive::turnPID::p,
         constants::drive::turnPID::i,
@@ -55,14 +48,13 @@ SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorC
     m_turnPID->SetTolerance(constants::drive::turnPID::tolerance);
     m_turnPID_F = constants::drive::turnPID::f;
 
-    fmt::print("Initializing Drive FF\n");
     m_driveFeedForward = std::make_unique<frc::SimpleMotorFeedforward<units::meters>>(
         constants::drive::driveFF::s,
         constants::drive::driveFF::v,
         constants::drive::driveFF::a);
 
     // Check if the motors or encoders have detected faults
-    bool faults_detected = ((m_driveMotor->GetStickyFaults() & m_turnMotor->GetStickyFaults() & m_turnEncoder->GetStickyFaultField().GetValue()) == 0);
+    bool faults_detected = ((m_driveMotor->GetStickyFaults() | m_turnMotor->GetStickyFaults() | m_turnEncoder->GetStickyFaultField().GetValue()) == 0);
     bool okay = m_driveMotor && m_turnMotor && m_turnEncoder && m_driveEncoder && m_drivePID && m_turnPID && m_driveFeedForward;
 
     if(okay)
@@ -85,21 +77,27 @@ SwerveModule::SwerveModule(std::string name, int driveMotorCanID, int turnMotorC
 void SwerveModule::Periodic()
 {
     units::meters_per_second_t velocity = GetDriveVelocity();
-    units::volt_t driveOutput { m_drivePID->Calculate(velocity.value()) };
-
     units::meters_per_second_t targetVelocity { m_drivePID->GetSetpoint() };
-    driveOutput += m_driveFeedForward->Calculate(targetVelocity);
-    driveOutput = std::clamp(driveOutput, -constants::drive::maxDriveVoltage, constants::drive::maxDriveVoltage);
 
+    units::volt_t driveOutputFF { m_driveFeedForward->Calculate(targetVelocity) };
+    units::volt_t driveOutputPID { m_drivePID->Calculate(velocity.value()) };
+
+    units::volt_t driveOutput = 0_V;
+
+    if(m_controlMode == ControlMode::OpenLoop)
+    {
+        driveOutput = driveOutputFF;
+    }
+    else if(m_controlMode == ControlMode::ClosedLoop)
+    {
+        driveOutput = driveOutputFF + driveOutputPID;
+    }
+
+    driveOutput = std::clamp(driveOutput, -constants::drive::maxDriveVoltage, constants::drive::maxDriveVoltage);
     m_driveMotor->SetVoltage(driveOutput);
-    
-    /*
-    //fmt::print("kS: {}, kV: {}\n", m_driveFeedForward->kS, m_driveFeedForward->kV);
-    */
    
     // if(m_name == "Swerve Module (FL)")
     //     fmt::print("Target velocity: {} m/s, velocity: {} m/s, voltage: {}V\n", targetVelocity.value(), velocity.value(), driveOutput.value());
-
 
     units::radian_t angle = GetTurnAngle();
     units::volt_t turnOutput { m_turnPID->Calculate(angle) };
@@ -157,6 +155,11 @@ void SwerveModule::SetTurnMotorInverted(bool inverted)
 void SwerveModule::SetDriveMotorInverted(bool inverted)
 {
     m_driveMotor->SetInverted(inverted);
+}
+
+void SwerveModule::SetControlMode(ControlMode controlMode)
+{
+    m_controlMode = controlMode;
 }
 
 void SwerveModule::SetTurnAngle(units::radian_t angle)

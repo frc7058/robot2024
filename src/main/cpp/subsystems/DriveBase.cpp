@@ -84,6 +84,8 @@ DriveBase::DriveBase(Vision& vision)
     m_headingPID->SetTolerance(headingTolerance.value());
     m_headingPID->EnableContinuousInput(-constants::pi, constants::pi);
 
+    SetDriveControlMode(ControlMode::ClosedLoop);
+
     InitializePreferences();
     ConfigurePathPlanner();
 
@@ -258,6 +260,21 @@ void DriveBase::DisableTracking()
 bool DriveBase::IsTrackingEnabled() const
 {
     return m_tracking;
+}
+
+void DriveBase::SetDriveControlMode(ControlMode controlMode)
+{
+    for(std::unique_ptr<SwerveModule>& swerveModule : m_swerveModules)
+    {
+        swerveModule->SetControlMode(controlMode);
+    }
+    
+    m_controlMode = controlMode;
+}
+
+ControlMode DriveBase::GetDriveControlMode() const 
+{
+    return m_controlMode;
 }
 
 units::radian_t DriveBase::GetHeading()
