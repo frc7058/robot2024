@@ -5,7 +5,7 @@
 #include <frc/filter/SlewRateLimiter.h>
 #include "constants/DriveConstants.h"
 #include "subsystems/DriveBase.h"
-#include "lib/vision.h"
+#include "lib/Vision.h"
 
 class DriveCommand : public frc2::CommandHelper<frc2::Command, DriveCommand>
 {
